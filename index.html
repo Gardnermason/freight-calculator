@@ -3,159 +3,223 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Freight Rate Calculator</title>
-    <!-- Tailwind CSS for styling -->
+    <title>Custom Freight Calculator</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts for custom font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;1,400;1,700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        /* Custom styles to match the design */
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #cce7ff; /* Light blue background from the image */
-        }
-        .calculator-title {
-            font-family: 'Merriweather', serif;
-            font-style: italic;
-        }
-        .input-label {
-             font-family: 'Merriweather', serif;
-             font-size: 1.75rem; /* 28px */
-             color: #003366; /* Dark blue text */
-        }
-        /* Custom focus ring color */
-        .form-input:focus {
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.5);
-            border-color: #007BFF;
-        }
+        body { font-family: 'Roboto', sans-serif; background-color: #cce7ff; }
+        .calculator-title { font-family: 'Merriweather', serif; font-style: italic; }
+        .input-label { font-family: 'Merriweather', serif; font-size: 1.5rem; color: #003366; }
+        .output-label { font-family: 'Merriweather', serif; font-size: 1.5rem; color: #003366; font-weight: bold; }
+        .form-input:focus { outline: none; box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.5); border-color: #007BFF; }
+        .output-field { background-color: #e0e7ff; font-weight: bold; }
+        .toggle-checkbox:checked { right: 0; border-color: #4f46e5; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #4f46e5; }
+        .mode-label { font-size: 1.125rem; font-weight: 600; color: #003366; text-align: center; }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen">
+<body class="flex items-center justify-center min-h-screen p-4">
 
-    <div class="w-full max-w-md mx-auto bg-white/30 backdrop-blur-sm p-8 rounded-2xl shadow-2xl">
+    <div class="w-full max-w-lg mx-auto bg-white/40 backdrop-blur-sm p-8 rounded-2xl shadow-2xl">
         
-        <!-- Header Section with Title -->
-        <div class="text-center mb-8">
+        <div class="text-center mb-4">
             <h2 class="text-3xl font-bold text-[#4169E1]" style="font-family: 'Merriweather', serif;">Thompson Transportation</h2>
-            <h1 class="calculator-title text-4xl font-bold text-[#003366] mt-2">Freight Rate Calculator</h1>
+            <h1 class="calculator-title text-4xl font-bold text-[#003366] mt-2">Freight Calculator</h1>
+        </div>
+
+        <!-- Mode Toggle -->
+        <div class="flex items-center justify-center space-x-3 mb-6 p-2 bg-blue-100 rounded-lg">
+            <span class="mode-label flex-1" id="modeLabel1">Generate a Quote</span>
+            <div class="relative inline-block w-14 align-middle select-none transition duration-200 ease-in">
+                <input type="checkbox" name="toggle" id="modeToggle" class="toggle-checkbox absolute block w-7 h-7 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
+                <label for="modeToggle" class="toggle-label block overflow-hidden h-7 rounded-full bg-gray-300 cursor-pointer"></label>
+            </div>
+            <span class="mode-label flex-1" id="modeLabel2">Calculate My Rate</span>
         </div>
 
         <!-- Calculator Form -->
-        <form id="rateCalculatorForm" class="space-y-6">
-
-            <!-- Miles Input -->
-            <div class="flex items-center justify-between space-x-4">
-                <label for="miles" class="input-label">Miles</label>
-                <input type="number" id="miles" name="miles" step="0.1" placeholder="e.g., 492.3" class="form-input w-40 p-3 text-lg text-right font-semibold bg-gray-50 border-2 border-gray-400 rounded-lg shadow-inner">
-            </div>
-
-            <!-- Selected Rate Input -->
-            <div class="flex items-center justify-between space-x-4">
-                <label for="rate" class="input-label">Selected Rate</label>
-                <div class="relative">
-                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-lg text-gray-500">$</span>
-                    <input type="number" id="rate" name="rate" step="0.01" placeholder="e.g., 3.00" class="form-input w-40 p-3 pl-7 text-lg text-right font-semibold bg-gray-50 border-2 border-gray-400 rounded-lg shadow-inner">
+        <form id="rateCalculatorForm" class="space-y-5">
+            
+            <!-- Primary Input Row -->
+            <div id="primaryInputSection">
+                <div class="flex items-center justify-between space-x-4">
+                    <label for="primaryInput" id="primaryInputLabel" class="input-label">Your Rate ($/Mile)</label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-lg text-gray-500">$</span>
+                        <input type="number" id="primaryInput" step="0.01" placeholder="e.g., 3.50" class="form-input w-48 p-3 pl-7 text-lg text-right font-semibold bg-gray-50 border-2 border-gray-400 rounded-lg shadow-inner">
+                    </div>
                 </div>
             </div>
 
-            <!-- FSC Input -->
+            <!-- Miles Input Row -->
+            <div class="flex items-center justify-between space-x-4">
+                <label for="miles" class="input-label">Total Miles</label>
+                <input type="number" id="miles" step="0.1" placeholder="e.g., 500" class="form-input w-48 p-3 text-lg text-right font-semibold bg-gray-50 border-2 border-gray-400 rounded-lg shadow-inner">
+            </div>
+
+            <!-- FSC Input Row -->
             <div class="flex items-center justify-between space-x-4">
                 <label for="fsc" class="input-label">FSC (%)</label>
-                 <div class="relative">
-                    <input type="number" id="fsc" name="fsc" value="0" step="1" class="form-input w-40 p-3 pr-7 text-lg text-right font-semibold bg-gray-50 border-2 border-gray-400 rounded-lg shadow-inner">
+                <div class="relative">
+                    <input type="number" id="fsc" placeholder="e.g., 10" class="form-input w-48 p-3 pr-8 text-lg text-right font-semibold bg-gray-50 border-2 border-gray-400 rounded-lg shadow-inner">
                     <span class="absolute right-3 top-1/2 -translate-y-1/2 text-lg text-gray-500">%</span>
                 </div>
             </div>
-            
+
             <!-- Divider -->
-            <hr class="border-t-2 border-gray-300 my-6">
+            <hr class="border-t-2 border-gray-300 my-5">
 
-            <!-- Final Total Output -->
+            <!-- Primary Output Row -->
             <div class="flex items-center justify-between space-x-4">
-                <label for="finalTotal" class="input-label">Final Total</label>
+                <label for="primaryOutput" id="primaryOutputLabel" class="output-label">Quote ($/Ton)</label>
                 <div class="relative">
                     <span class="absolute left-3 top-1/2 -translate-y-1/2 text-lg text-gray-500">$</span>
-                    <input type="text" id="finalTotal" name="finalTotal" readonly class="form-input w-40 p-3 pl-7 text-lg text-right font-bold bg-blue-100 border-2 border-gray-400 rounded-lg shadow-inner cursor-not-allowed">
+                    <input type="text" id="primaryOutput" readonly class="form-input output-field w-48 p-3 pl-7 text-lg text-right border-2 border-gray-400 rounded-lg shadow-inner cursor-not-allowed">
                 </div>
             </div>
 
-            <!-- CPNT Output -->
+            <!-- FSC Total Output Row -->
             <div class="flex items-center justify-between space-x-4">
-                <label for="cpnt" class="input-label">CPNT</label>
+                <label for="fscTotal" class="output-label">FSC Total</label>
                 <div class="relative">
                     <span class="absolute left-3 top-1/2 -translate-y-1/2 text-lg text-gray-500">$</span>
-                    <input type="text" id="cpnt" name="cpnt" readonly class="form-input w-40 p-3 pl-7 text-lg text-right font-bold bg-blue-100 border-2 border-gray-400 rounded-lg shadow-inner cursor-not-allowed">
+                    <input type="text" id="fscTotal" readonly class="form-input output-field w-48 p-3 pl-7 text-lg text-right border-2 border-gray-400 rounded-lg shadow-inner cursor-not-allowed">
                 </div>
             </div>
 
-             <!-- Action Buttons -->
-            <div class="flex justify-center pt-6">
-                <button type="button" id="resetButton" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition-transform transform hover:scale-105">
-                    Reset
-                </button>
+            <!-- Final Total Output Row -->
+            <div class="flex items-center justify-between space-x-4">
+                <label for="finalTotal" class="output-label">Final Total</label>
+                <div class="relative">
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-lg text-gray-500">$</span>
+                    <input type="text" id="finalTotal" readonly class="form-input output-field w-48 p-3 pl-7 text-lg text-right border-2 border-gray-400 rounded-lg shadow-inner cursor-not-allowed">
+                </div>
             </div>
 
+            <!-- Action Buttons -->
+            <div class="flex items-center justify-center space-x-4 pt-5">
+                <button type="button" id="copyButton" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition-transform transform hover:scale-105">Copy</button>
+                <button type="button" id="resetButton" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition-transform transform hover:scale-105">Reset</button>
+            </div>
+            <div id="copyNotification" class="text-center text-green-700 font-semibold mt-2 h-6 opacity-0 transition-opacity duration-300">Copied to clipboard!</div>
         </form>
     </div>
+    
+    <textarea id="copySource" class="sr-only"></textarea>
 
     <script>
-        // --- DOM Element Selection ---
-        const milesInput = document.getElementById('miles');
-        const rateInput = document.getElementById('rate');
-        const fscInput = document.getElementById('fsc');
-        const finalTotalOutput = document.getElementById('finalTotal');
-        const cpntOutput = document.getElementById('cpnt');
         const form = document.getElementById('rateCalculatorForm');
+        const modeToggle = document.getElementById('modeToggle');
+        const primaryInput = document.getElementById('primaryInput');
+        const primaryInputLabel = document.getElementById('primaryInputLabel');
+        const milesInput = document.getElementById('miles');
+        const fscInput = document.getElementById('fsc');
+        const primaryOutput = document.getElementById('primaryOutput');
+        const primaryOutputLabel = document.getElementById('primaryOutputLabel');
+        const fscTotal = document.getElementById('fscTotal');
+        const finalTotal = document.getElementById('finalTotal');
+        const copyButton = document.getElementById('copyButton');
         const resetButton = document.getElementById('resetButton');
+        const copyNotification = document.getElementById('copyNotification');
+        const copySource = document.getElementById('copySource');
+        const modeLabel1 = document.getElementById('modeLabel1');
+        const modeLabel2 = document.getElementById('modeLabel2');
 
-        // --- Constants ---
         const NET_TONNAGE = 23;
+        let currentMode = 'generateQuote'; // 'generateQuote' or 'calculateRate'
 
-        // --- Core Calculation Function ---
-        function calculateRate() {
-            // 1. Get and parse input values, providing defaults if empty or invalid.
+        function updateUIMode() {
+            currentMode = modeToggle.checked ? 'calculateRate' : 'generateQuote';
+
+            // Clear all fields on mode switch to avoid confusion
+            form.reset();
+            calculate();
+
+            if (currentMode === 'generateQuote') {
+                primaryInputLabel.textContent = 'Your Rate ($/Mile)';
+                primaryOutputLabel.textContent = 'Quote ($/Ton)';
+                primaryInput.placeholder = 'e.g., 3.50';
+                modeLabel1.classList.add('font-extrabold');
+                modeLabel2.classList.remove('font-extrabold');
+            } else { // calculateRate
+                primaryInputLabel.textContent = 'Offer ($/Ton)';
+                primaryOutputLabel.textContent = 'Your Rate ($/Mile)';
+                primaryInput.placeholder = 'e.g., 150.00';
+                modeLabel2.classList.add('font-extrabold');
+                modeLabel1.classList.remove('font-extrabold');
+            }
+        }
+
+        function calculate() {
+            const pInput = parseFloat(primaryInput.value) || 0;
             const miles = parseFloat(milesInput.value) || 0;
-            const rate = parseFloat(rateInput.value) || 0;
-            const fscPercentage = parseFloat(fscInput.value) || 0;
+            const fscPercent = parseFloat(fscInput.value) || 0;
 
-            // 2. Perform the freight calculations.
-            // Line haul is the base rate for the distance.
-            const lineHaul = miles * rate;
-            
-            // Fuel Surcharge amount is calculated from the line haul.
-            const fscAmount = lineHaul * (fscPercentage / 100);
-            
-            // The final total includes the line haul and the fuel surcharge.
-            const finalTotal = lineHaul + fscAmount;
-            
-            // Cost Per Net Ton is the final total divided by the standard tonnage.
-            const costPerNetTon = finalTotal > 0 ? finalTotal / NET_TONNAGE : 0;
+            let lineHaul = 0;
+            let fscAmount = 0;
+            let total = 0;
+            let pOutput = 0;
 
-            // 3. Update the output fields with formatted currency values.
-            // Using toLocaleString for proper comma formatting and currency style.
-            finalTotalOutput.value = finalTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-            cpntOutput.value = costPerNetTon.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            if (currentMode === 'generateQuote') {
+                // Scenario: We know our rate per mile, we need to quote a cost per ton.
+                const myRatePerMile = pInput;
+                lineHaul = myRatePerMile * miles;
+                fscAmount = lineHaul * (fscPercent / 100);
+                total = lineHaul + fscAmount;
+                pOutput = total > 0 ? total / NET_TONNAGE : 0;
+            } else { // calculateRate
+                // Scenario: Customer gives us a rate per ton, we need to find our rate per mile.
+                const customerRatePerTon = pInput;
+                lineHaul = customerRatePerTon * NET_TONNAGE;
+                fscAmount = lineHaul * (fscPercent / 100);
+                total = lineHaul + fscAmount;
+                pOutput = miles > 0 ? total / miles : 0;
+            }
+
+            // Update UI
+            primaryOutput.value = pOutput > 0 ? pOutput.toFixed(2) : '';
+            fscTotal.value = fscAmount > 0 ? fscAmount.toFixed(2) : '';
+            finalTotal.value = total > 0 ? total.toFixed(2) : '';
         }
 
         // --- Event Listeners ---
-        // Recalculate whenever any of the input fields change.
-        milesInput.addEventListener('input', calculateRate);
-        rateInput.addEventListener('input', calculateRate);
-        fscInput.addEventListener('input', calculateRate);
-
-        // Handle the reset button click.
-        resetButton.addEventListener('click', () => {
-            form.reset(); // Resets all form fields to their initial state
-            calculateRate(); // Recalculate to update outputs to zero
+        [primaryInput, milesInput, fscInput].forEach(input => {
+            input.addEventListener('input', calculate);
         });
-        
-        // --- Initial Calculation ---
-        // Run the calculation once on page load to initialize the output fields.
-        calculateRate();
 
+        modeToggle.addEventListener('change', updateUIMode);
+
+        resetButton.addEventListener('click', () => {
+            form.reset();
+            calculate();
+        });
+
+        copyButton.addEventListener('click', () => {
+            const summary = `
+Freight Quote Summary:
+- Mode: ${currentMode === 'generateQuote' ? 'Generated Quote' : 'Calculated Rate'}
+- Miles: ${milesInput.value || 'N/A'}
+- FSC: ${fscInput.value || 0}%
+---
+- Final Total: $${finalTotal.value || '0.00'}
+- FSC Amount: $${fscTotal.value || '0.00'}
+---
+- Quote to Customer: $${currentMode === 'generateQuote' ? primaryOutput.value : primaryInput.value || 'N/A'} / ton
+- Your Rate: $${currentMode === 'calculateRate' ? primaryOutput.value : primaryInput.value || 'N/A'} / mile
+            `.trim();
+
+            copySource.value = summary;
+            copySource.select();
+            document.execCommand('copy');
+
+            copyNotification.style.opacity = '1';
+            setTimeout(() => { copyNotification.style.opacity = '0'; }, 2000);
+        });
+
+        // Initial setup
+        updateUIMode();
     </script>
 </body>
 </html>
