@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Freight Rate Calculator</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for custom font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;1,400;1,700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* Custom styles to match the design */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #cce7ff; /* Light blue background from the image */
+        }
+        .calculator-title {
+            font-family: 'Merriweather', serif;
+            font-style: italic;
+        }
+        .input-label {
+             font-family: 'Merriweather', serif;
+             font-size: 1.75rem; /* 28px */
+             color: #003366; /* Dark blue text */
+        }
+        /* Custom focus ring color */
+        .form-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.5);
+            border-color: #007BFF;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen">
+
+    <div class="w-full max-w-md mx-auto bg-white/30 backdrop-blur-sm p-8 rounded-2xl shadow-2xl">
+        
+        <!-- Header Section with Title -->
+        <div class="text-center mb-8">
+            <h2 class="text-3xl font-bold text-[#4169E1]" style="font-family: 'Merriweather', serif;">Thompson Transportation</h2>
+            <h1 class="calculator-title text-4xl font-bold text-[#003366] mt-2">Freight Rate Calculator</h1>
+        </div>
+
+        <!-- Calculator Form -->
+        <form id="rateCalculatorForm" class="space-y-6">
+
+            <!-- Miles Input -->
+            <div class="flex items-center justify-between space-x-4">
+                <label for="miles" class="input-label">Miles</label>
+                <input type="number" id="miles" name="miles" step="0.1" placeholder="e.g., 492.3" class="form-input w-40 p-3 text-lg text-right font-semibold bg-gray-50 border-2 border-gray-400 rounded-lg shadow-inner">
+            </div>
+
+            <!-- Selected Rate Input -->
+            <div class="flex items-center justify-between space-x-4">
+                <label for="rate" class="input-label">Selected Rate</label>
+                <div class="relative">
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-lg text-gray-500">$</span>
+                    <input type="number" id="rate" name="rate" step="0.01" placeholder="e.g., 3.00" class="form-input w-40 p-3 pl-7 text-lg text-right font-semibold bg-gray-50 border-2 border-gray-400 rounded-lg shadow-inner">
+                </div>
+            </div>
+
+            <!-- FSC Input -->
+            <div class="flex items-center justify-between space-x-4">
+                <label for="fsc" class="input-label">FSC (%)</label>
+                 <div class="relative">
+                    <input type="number" id="fsc" name="fsc" value="0" step="1" class="form-input w-40 p-3 pr-7 text-lg text-right font-semibold bg-gray-50 border-2 border-gray-400 rounded-lg shadow-inner">
+                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-lg text-gray-500">%</span>
+                </div>
+            </div>
+            
+            <!-- Divider -->
+            <hr class="border-t-2 border-gray-300 my-6">
+
+            <!-- Final Total Output -->
+            <div class="flex items-center justify-between space-x-4">
+                <label for="finalTotal" class="input-label">Final Total</label>
+                <div class="relative">
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-lg text-gray-500">$</span>
+                    <input type="text" id="finalTotal" name="finalTotal" readonly class="form-input w-40 p-3 pl-7 text-lg text-right font-bold bg-blue-100 border-2 border-gray-400 rounded-lg shadow-inner cursor-not-allowed">
+                </div>
+            </div>
+
+            <!-- CPNT Output -->
+            <div class="flex items-center justify-between space-x-4">
+                <label for="cpnt" class="input-label">CPNT</label>
+                <div class="relative">
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-lg text-gray-500">$</span>
+                    <input type="text" id="cpnt" name="cpnt" readonly class="form-input w-40 p-3 pl-7 text-lg text-right font-bold bg-blue-100 border-2 border-gray-400 rounded-lg shadow-inner cursor-not-allowed">
+                </div>
+            </div>
+
+             <!-- Action Buttons -->
+            <div class="flex justify-center pt-6">
+                <button type="button" id="resetButton" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition-transform transform hover:scale-105">
+                    Reset
+                </button>
+            </div>
+
+        </form>
+    </div>
+
+    <script>
+        // --- DOM Element Selection ---
+        const milesInput = document.getElementById('miles');
+        const rateInput = document.getElementById('rate');
+        const fscInput = document.getElementById('fsc');
+        const finalTotalOutput = document.getElementById('finalTotal');
+        const cpntOutput = document.getElementById('cpnt');
+        const form = document.getElementById('rateCalculatorForm');
+        const resetButton = document.getElementById('resetButton');
+
+        // --- Constants ---
+        const NET_TONNAGE = 23;
+
+        // --- Core Calculation Function ---
+        function calculateRate() {
+            // 1. Get and parse input values, providing defaults if empty or invalid.
+            const miles = parseFloat(milesInput.value) || 0;
+            const rate = parseFloat(rateInput.value) || 0;
+            const fscPercentage = parseFloat(fscInput.value) || 0;
+
+            // 2. Perform the freight calculations.
+            // Line haul is the base rate for the distance.
+            const lineHaul = miles * rate;
+            
+            // Fuel Surcharge amount is calculated from the line haul.
+            const fscAmount = lineHaul * (fscPercentage / 100);
+            
+            // The final total includes the line haul and the fuel surcharge.
+            const finalTotal = lineHaul + fscAmount;
+            
+            // Cost Per Net Ton is the final total divided by the standard tonnage.
+            const costPerNetTon = finalTotal > 0 ? finalTotal / NET_TONNAGE : 0;
+
+            // 3. Update the output fields with formatted currency values.
+            // Using toLocaleString for proper comma formatting and currency style.
+            finalTotalOutput.value = finalTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            cpntOutput.value = costPerNetTon.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        // --- Event Listeners ---
+        // Recalculate whenever any of the input fields change.
+        milesInput.addEventListener('input', calculateRate);
+        rateInput.addEventListener('input', calculateRate);
+        fscInput.addEventListener('input', calculateRate);
+
+        // Handle the reset button click.
+        resetButton.addEventListener('click', () => {
+            form.reset(); // Resets all form fields to their initial state
+            calculateRate(); // Recalculate to update outputs to zero
+        });
+        
+        // --- Initial Calculation ---
+        // Run the calculation once on page load to initialize the output fields.
+        calculateRate();
+
+    </script>
+</body>
+</html>
