@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,37 +8,91 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;1,400;1,700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script>
+        // Apply dark mode immediately from localStorage to prevent flashing
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
     <style>
-        body { font-family: 'Roboto', sans-serif; background-color: #cce7ff; }
+        body { 
+            font-family: 'Roboto', sans-serif; 
+            background-color: #cce7ff;
+            transition: background-color 0.3s ease;
+        }
+        .dark body {
+            background-color: #0d1a26;
+        }
         .calculator-title { font-family: 'Merriweather', serif; font-style: italic; }
         .input-label { font-family: 'Merriweather', serif; font-size: 1.5rem; color: #003366; }
-        .output-label { font-family: 'Merriweather', serif; font-size: 1.5rem; color: #003366; font-weight: bold; }
+        .dark .input-label { color: #aaccff; }
+        .output-label { font-family: 'Merriweather', serif; font-size: 1.5rem; font-weight: bold; color: #003366; }
+        .dark .output-label { color: #aaccff; }
         .form-input:focus { outline: none; box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.5); border-color: #007BFF; }
         .output-field { background-color: #e0e7ff; font-weight: bold; }
+        .dark .output-field { background-color: #1e3a5f; color: #e0e7ff; }
         .mode-btn {
             transition: all 0.2s ease-in-out;
-            background-color: #dbeafe; /* blue-100 */
-            color: #1e40af; /* blue-800 */
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+        .dark .mode-btn {
+            background-color: #1e3a5f;
+            color: #aaccff;
         }
         .active-mode {
-            background-color: #3b82f6; /* blue-500 */
+            background-color: #3b82f6;
             color: white;
             font-weight: bold;
             transform: scale(1.05);
+        }
+        .dark .active-mode {
+            background-color: #60a5fa;
+            color: #0d1a26;
+        }
+        /* Print Styles */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .print-area, .print-area * {
+                visibility: visible;
+            }
+            .print-area {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen p-4">
 
-    <div class="w-full max-w-lg mx-auto bg-white/40 backdrop-blur-sm p-8 rounded-2xl shadow-2xl">
+    <div id="calculator-ui" class="w-full max-w-lg mx-auto bg-white/40 dark:bg-black/20 backdrop-blur-sm p-8 rounded-2xl shadow-2xl transition-colors duration-300">
         
-        <div class="text-center mb-4">
-            <h2 class="text-3xl font-bold text-[#4169E1]" style="font-family: 'Merriweather', serif;">Thompson Transportation</h2>
-            <h1 class="calculator-title text-4xl font-bold text-[#003366] mt-2">Freight Calculator</h1>
+        <!-- Header Section -->
+        <div class="flex justify-between items-center mb-4">
+            <!-- Spacer to balance the theme toggle button -->
+            <div class="w-8"></div>
+            <!-- Centered Title Group -->
+            <div class="text-center">
+                <h2 class="text-3xl font-bold text-[#4169E1] dark:text-blue-400" style="font-family: 'Merriweather', serif;">Thompson Transportation</h2>
+                <h1 class="calculator-title text-4xl font-bold text-[#003366] dark:text-blue-200 mt-2">Freight Calculator</h1>
+            </div>
+            <!-- Dark Mode Toggle -->
+            <div class="w-8">
+                <button id="theme-toggle" type="button" class="p-1 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
+                    <svg id="theme-toggle-dark-icon" class="hidden w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+                    <svg id="theme-toggle-light-icon" class="hidden w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm-.707 10.607a1 1 0 010-1.414l.707-.707a1 1 0 111.414 1.414l-.707.707a1 1 0 01-1.414 0zM3 11a1 1 0 100-2H2a1 1 0 100 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
+                </button>
+            </div>
         </div>
 
         <!-- Mode Selector -->
-        <div class="grid grid-cols-3 gap-2 mb-6 p-2 bg-blue-200 rounded-lg">
+        <div class="grid grid-cols-3 gap-2 mb-6 p-2 bg-blue-200 dark:bg-gray-800 rounded-lg">
             <button type="button" id="mode-quote" class="mode-btn py-2 px-1 rounded-md text-sm sm:text-base">Generate Quote</button>
             <button type="button" id="mode-ton" class="mode-btn py-2 px-1 rounded-md text-sm sm:text-base">Calc from Ton</button>
             <button type="button" id="mode-flat" class="mode-btn py-2 px-1 rounded-md text-sm sm:text-base">Calc from Flat</button>
@@ -47,69 +101,58 @@
         <!-- Calculator Form -->
         <form id="rateCalculatorForm" class="space-y-5">
             
-            <!-- Primary Input Row -->
             <div id="primaryInputSection">
                 <div class="flex items-center justify-between space-x-4">
                     <label for="primaryInput" id="primaryInputLabel" class="input-label">Your Rate ($/Mile)</label>
-                    <div class="relative">
-                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-lg text-gray-500">$</span>
-                        <input type="number" id="primaryInput" step="0.01" placeholder="e.g., 3.50" class="form-input w-48 p-3 pl-7 text-lg text-right font-semibold bg-gray-50 border-2 border-gray-400 rounded-lg shadow-inner">
-                    </div>
+                    <div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-lg text-gray-500">$</span><input type="number" id="primaryInput" step="0.01" placeholder="e.g., 3.50" class="form-input w-48 p-3 pl-7 text-lg text-right font-semibold bg-gray-50 dark:bg-gray-700 dark:text-white border-2 border-gray-400 dark:border-gray-600 rounded-lg shadow-inner"></div>
                 </div>
             </div>
-
-            <!-- Miles Input Row -->
             <div class="flex items-center justify-between space-x-4">
                 <label for="miles" class="input-label">Total Miles</label>
-                <input type="number" id="miles" step="0.1" placeholder="e.g., 500" class="form-input w-48 p-3 text-lg text-right font-semibold bg-gray-50 border-2 border-gray-400 rounded-lg shadow-inner">
+                <input type="number" id="miles" step="0.1" placeholder="e.g., 500" class="form-input w-48 p-3 text-lg text-right font-semibold bg-gray-50 dark:bg-gray-700 dark:text-white border-2 border-gray-400 dark:border-gray-600 rounded-lg shadow-inner">
             </div>
-
-            <!-- FSC Input Row -->
             <div class="flex items-center justify-between space-x-4">
                 <label for="fsc" class="input-label">FSC (%)</label>
-                <div class="relative">
-                    <input type="number" id="fsc" placeholder="e.g., 10" class="form-input w-48 p-3 pr-8 text-lg text-right font-semibold bg-gray-50 border-2 border-gray-400 rounded-lg shadow-inner">
-                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-lg text-gray-500">%</span>
-                </div>
+                <div class="relative"><input type="number" id="fsc" placeholder="e.g., 10" class="form-input w-48 p-3 pr-8 text-lg text-right font-semibold bg-gray-50 dark:bg-gray-700 dark:text-white border-2 border-gray-400 dark:border-gray-600 rounded-lg shadow-inner"><span class="absolute right-3 top-1/2 -translate-y-1/2 text-lg text-gray-500">%</span></div>
             </div>
-
-            <!-- Divider -->
-            <hr class="border-t-2 border-gray-300 my-5">
-
-            <!-- Primary Output Row -->
+            <hr class="border-t-2 border-gray-300 dark:border-gray-600 my-5">
             <div class="flex items-center justify-between space-x-4">
                 <label for="primaryOutput" id="primaryOutputLabel" class="output-label">Quote ($/Ton)</label>
-                <div class="relative">
-                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-lg text-gray-500">$</span>
-                    <input type="text" id="primaryOutput" readonly class="form-input output-field w-48 p-3 pl-7 text-lg text-right border-2 border-gray-400 rounded-lg shadow-inner cursor-not-allowed">
-                </div>
+                <div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-lg text-gray-500">$</span><input type="text" id="primaryOutput" readonly class="form-input output-field w-48 p-3 pl-7 text-lg text-right border-2 border-gray-400 dark:border-gray-600 rounded-lg shadow-inner cursor-not-allowed"></div>
             </div>
-
-            <!-- FSC Total Output Row -->
             <div class="flex items-center justify-between space-x-4">
                 <label for="fscTotal" class="output-label">FSC Total</label>
-                <div class="relative">
-                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-lg text-gray-500">$</span>
-                    <input type="text" id="fscTotal" readonly class="form-input output-field w-48 p-3 pl-7 text-lg text-right border-2 border-gray-400 rounded-lg shadow-inner cursor-not-allowed">
-                </div>
+                <div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-lg text-gray-500">$</span><input type="text" id="fscTotal" readonly class="form-input output-field w-48 p-3 pl-7 text-lg text-right border-2 border-gray-400 dark:border-gray-600 rounded-lg shadow-inner cursor-not-allowed"></div>
             </div>
-
-            <!-- Final Total Output Row -->
             <div class="flex items-center justify-between space-x-4">
                 <label for="finalTotal" class="output-label">Final Total</label>
-                <div class="relative">
-                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-lg text-gray-500">$</span>
-                    <input type="text" id="finalTotal" readonly class="form-input output-field w-48 p-3 pl-7 text-lg text-right border-2 border-gray-400 rounded-lg shadow-inner cursor-not-allowed">
-                </div>
+                <div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-lg text-gray-500">$</span><input type="text" id="finalTotal" readonly class="form-input output-field w-48 p-3 pl-7 text-lg text-right border-2 border-gray-400 dark:border-gray-600 rounded-lg shadow-inner cursor-not-allowed"></div>
             </div>
-
-            <!-- Action Buttons -->
-            <div class="flex items-center justify-center space-x-4 pt-5">
-                <button type="button" id="copyButton" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition-transform transform hover:scale-105">Copy</button>
-                <button type="button" id="resetButton" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition-transform transform hover:scale-105">Reset</button>
+            <div class="flex items-center justify-center space-x-2 pt-5">
+                <button type="button" id="printButton" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-transform transform hover:scale-105">Print</button>
+                <button type="button" id="copyButton" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-transform transform hover:scale-105">Copy</button>
+                <button type="button" id="resetButton" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-transform transform hover:scale-105">Reset</button>
             </div>
-            <div id="copyNotification" class="text-center text-green-700 font-semibold mt-2 h-6 opacity-0 transition-opacity duration-300">Copied to clipboard!</div>
+            <div id="copyNotification" class="text-center text-green-700 dark:text-green-400 font-semibold mt-2 h-6 opacity-0 transition-opacity duration-300">Copied to clipboard!</div>
         </form>
+    </div>
+
+    <!-- Printable Area -->
+    <div class="print-area hidden">
+        <div class="p-8">
+            <h1 class="text-2xl font-bold mb-2">Thompson Transportation</h1>
+            <h2 class="text-xl font-semibold mb-6 border-b pb-2">Freight Calculation Summary</h2>
+            <p class="mb-2 text-lg"><strong class="w-48 inline-block">Date:</strong> <span id="print-date"></span></p>
+            <p class="mb-2 text-lg"><strong class="w-48 inline-block">Calculation Mode:</strong> <span id="print-mode"></span></p>
+            <p class="mb-2 text-lg"><strong class="w-48 inline-block">Total Miles:</strong> <span id="print-miles"></span></p>
+            <p class="mb-2 text-lg"><strong class="w-48 inline-block">FSC (%):</strong> <span id="print-fsc"></span></p>
+            <hr class="my-4">
+            <p class="mb-2 text-lg"><strong class="w-48 inline-block" id="print-your-rate-label">Your Rate:</strong> <span id="print-your-rate"></span></p>
+            <p class="mb-2 text-lg"><strong class="w-48 inline-block" id="print-offer-label">Customer Offer:</strong> <span id="print-offer"></span></p>
+            <hr class="my-4">
+            <p class="mb-2 text-lg"><strong class="w-48 inline-block">FSC Total:</strong> <span id="print-fsc-total"></span></p>
+            <p class="text-xl font-bold mt-4"><strong class="w-48 inline-block">Final Total:</strong> <span id="print-final-total"></span></p>
+        </div>
     </div>
     
     <textarea id="copySource" class="sr-only"></textarea>
@@ -126,8 +169,12 @@
         const finalTotal = document.getElementById('finalTotal');
         const copyButton = document.getElementById('copyButton');
         const resetButton = document.getElementById('resetButton');
+        const printButton = document.getElementById('printButton');
         const copyNotification = document.getElementById('copyNotification');
         const copySource = document.getElementById('copySource');
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+        const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
         
         const modeButtons = {
             quote: document.getElementById('mode-quote'),
@@ -136,18 +183,29 @@
         };
 
         const NET_TONNAGE = 23;
-        let currentMode = 'generateQuote'; // 'generateQuote', 'calculateFromTon', 'calculateFromFlat'
+        let currentMode = 'generateQuote';
 
+        // --- Dark Mode Logic ---
+        function updateThemeIcon(isDarkMode) {
+            themeToggleDarkIcon.classList.toggle('hidden', !isDarkMode);
+            themeToggleLightIcon.classList.toggle('hidden', isDarkMode);
+        }
+
+        themeToggleBtn.addEventListener('click', function() {
+            document.documentElement.classList.toggle('dark');
+            const isDarkMode = document.documentElement.classList.contains('dark');
+            localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+            updateThemeIcon(isDarkMode);
+        });
+
+        // --- Main App Logic ---
         function setMode(newMode) {
             currentMode = newMode;
-            
-            // Update button styles
             Object.values(modeButtons).forEach(btn => btn.classList.remove('active-mode'));
             if (newMode === 'generateQuote') modeButtons.quote.classList.add('active-mode');
             if (newMode === 'calculateFromTon') modeButtons.ton.classList.add('active-mode');
             if (newMode === 'calculateFromFlat') modeButtons.flat.classList.add('active-mode');
 
-            // Clear form and update UI labels/placeholders
             form.reset();
             calculate();
 
@@ -179,52 +237,34 @@
             let pOutput = 0;
 
             switch (currentMode) {
-                case 'generateQuote':
-                    lineHaul = pInput * miles;
-                    break;
-                case 'calculateFromTon':
-                    lineHaul = pInput * NET_TONNAGE;
-                    break;
-                case 'calculateFromFlat':
-                    lineHaul = pInput;
-                    break;
+                case 'generateQuote': lineHaul = pInput * miles; break;
+                case 'calculateFromTon': lineHaul = pInput * NET_TONNAGE; break;
+                case 'calculateFromFlat': lineHaul = pInput; break;
             }
 
             const fscAmount = lineHaul * (fscPercent / 100);
             const total = lineHaul + fscAmount;
 
             switch (currentMode) {
-                case 'generateQuote':
-                    pOutput = total > 0 ? total / NET_TONNAGE : 0;
-                    break;
+                case 'generateQuote': pOutput = total > 0 ? total / NET_TONNAGE : 0; break;
                 case 'calculateFromTon':
-                case 'calculateFromFlat':
-                    pOutput = miles > 0 ? total / miles : 0;
-                    break;
+                case 'calculateFromFlat': pOutput = miles > 0 ? total / miles : 0; break;
             }
 
-            // Update UI
             primaryOutput.value = pOutput > 0 ? pOutput.toFixed(2) : '';
             fscTotal.value = fscAmount > 0 ? fscAmount.toFixed(2) : '';
             finalTotal.value = total > 0 ? total.toFixed(2) : '';
         }
 
         // --- Event Listeners ---
-        [primaryInput, milesInput, fscInput].forEach(input => {
-            input.addEventListener('input', calculate);
-        });
-
+        [primaryInput, milesInput, fscInput].forEach(input => input.addEventListener('input', calculate));
         modeButtons.quote.addEventListener('click', () => setMode('generateQuote'));
         modeButtons.ton.addEventListener('click', () => setMode('calculateFromTon'));
         modeButtons.flat.addEventListener('click', () => setMode('calculateFromFlat'));
-
-        resetButton.addEventListener('click', () => {
-            form.reset();
-            calculate();
-        });
+        resetButton.addEventListener('click', () => { form.reset(); calculate(); });
 
         copyButton.addEventListener('click', () => {
-            const summary = `
+             const summary = `
 Freight Calculation Summary:
 - Mode: ${modeButtons[currentMode.replace('calculateFrom', '').toLowerCase()].textContent}
 - Miles: ${milesInput.value || 'N/A'}
@@ -236,17 +276,29 @@ Freight Calculation Summary:
 - Your Rate: $${currentMode === 'generateQuote' ? primaryInput.value : primaryOutput.value || 'N/A'} / mile
 - Customer Offer: $${currentMode !== 'generateQuote' ? primaryInput.value : primaryOutput.value || 'N/A'} ${currentMode === 'calculateFromTon' ? '/ ton' : ''}
             `.trim();
-
             copySource.value = summary;
             copySource.select();
             document.execCommand('copy');
-
             copyNotification.style.opacity = '1';
             setTimeout(() => { copyNotification.style.opacity = '0'; }, 2000);
         });
 
-        // Initial setup
+        printButton.addEventListener('click', () => {
+            // Populate the print area
+            document.getElementById('print-date').textContent = new Date().toLocaleDateString();
+            document.getElementById('print-mode').textContent = modeButtons[currentMode.replace('calculateFrom', '').toLowerCase()].textContent;
+            document.getElementById('print-miles').textContent = milesInput.value || 'N/A';
+            document.getElementById('print-fsc').textContent = `${fscInput.value || 0}%`;
+            document.getElementById('print-your-rate').textContent = `$${currentMode === 'generateQuote' ? primaryInput.value : primaryOutput.value || 'N/A'} / mile`;
+            document.getElementById('print-offer').textContent = `$${currentMode !== 'generateQuote' ? primaryInput.value : primaryOutput.value || 'N/A'} ${currentMode === 'calculateFromTon' ? '/ ton' : ''}`;
+            document.getElementById('print-fsc-total').textContent = `$${fscTotal.value || '0.00'}`;
+            document.getElementById('print-final-total').textContent = `$${finalTotal.value || '0.00'}`;
+            window.print();
+        });
+
+        // --- Initial Setup ---
         setMode('generateQuote');
+        updateThemeIcon(document.documentElement.classList.contains('dark'));
     </script>
 </body>
 </html>
