@@ -15,9 +15,17 @@
         .output-label { font-family: 'Merriweather', serif; font-size: 1.5rem; color: #003366; font-weight: bold; }
         .form-input:focus { outline: none; box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.5); border-color: #007BFF; }
         .output-field { background-color: #e0e7ff; font-weight: bold; }
-        .toggle-checkbox:checked { right: 0; border-color: #4f46e5; }
-        .toggle-checkbox:checked + .toggle-label { background-color: #4f46e5; }
-        .mode-label { font-size: 1.125rem; font-weight: 600; color: #003366; text-align: center; }
+        .mode-btn {
+            transition: all 0.2s ease-in-out;
+            background-color: #dbeafe; /* blue-100 */
+            color: #1e40af; /* blue-800 */
+        }
+        .active-mode {
+            background-color: #3b82f6; /* blue-500 */
+            color: white;
+            font-weight: bold;
+            transform: scale(1.05);
+        }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen p-4">
@@ -29,14 +37,11 @@
             <h1 class="calculator-title text-4xl font-bold text-[#003366] mt-2">Freight Calculator</h1>
         </div>
 
-        <!-- Mode Toggle -->
-        <div class="flex items-center justify-center space-x-3 mb-6 p-2 bg-blue-100 rounded-lg">
-            <span class="mode-label flex-1" id="modeLabel1">Generate a Quote</span>
-            <div class="relative inline-block w-14 align-middle select-none transition duration-200 ease-in">
-                <input type="checkbox" name="toggle" id="modeToggle" class="toggle-checkbox absolute block w-7 h-7 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
-                <label for="modeToggle" class="toggle-label block overflow-hidden h-7 rounded-full bg-gray-300 cursor-pointer"></label>
-            </div>
-            <span class="mode-label flex-1" id="modeLabel2">Calculate My Rate</span>
+        <!-- Mode Selector -->
+        <div class="grid grid-cols-3 gap-2 mb-6 p-2 bg-blue-200 rounded-lg">
+            <button type="button" id="mode-quote" class="mode-btn py-2 px-1 rounded-md text-sm sm:text-base">Generate Quote</button>
+            <button type="button" id="mode-ton" class="mode-btn py-2 px-1 rounded-md text-sm sm:text-base">Calc from Ton</button>
+            <button type="button" id="mode-flat" class="mode-btn py-2 px-1 rounded-md text-sm sm:text-base">Calc from Flat</button>
         </div>
 
         <!-- Calculator Form -->
@@ -111,7 +116,6 @@
 
     <script>
         const form = document.getElementById('rateCalculatorForm');
-        const modeToggle = document.getElementById('modeToggle');
         const primaryInput = document.getElementById('primaryInput');
         const primaryInputLabel = document.getElementById('primaryInputLabel');
         const milesInput = document.getElementById('miles');
@@ -124,31 +128,45 @@
         const resetButton = document.getElementById('resetButton');
         const copyNotification = document.getElementById('copyNotification');
         const copySource = document.getElementById('copySource');
-        const modeLabel1 = document.getElementById('modeLabel1');
-        const modeLabel2 = document.getElementById('modeLabel2');
+        
+        const modeButtons = {
+            quote: document.getElementById('mode-quote'),
+            ton: document.getElementById('mode-ton'),
+            flat: document.getElementById('mode-flat')
+        };
 
         const NET_TONNAGE = 23;
-        let currentMode = 'generateQuote'; // 'generateQuote' or 'calculateRate'
+        let currentMode = 'generateQuote'; // 'generateQuote', 'calculateFromTon', 'calculateFromFlat'
 
-        function updateUIMode() {
-            currentMode = modeToggle.checked ? 'calculateRate' : 'generateQuote';
+        function setMode(newMode) {
+            currentMode = newMode;
+            
+            // Update button styles
+            Object.values(modeButtons).forEach(btn => btn.classList.remove('active-mode'));
+            if (newMode === 'generateQuote') modeButtons.quote.classList.add('active-mode');
+            if (newMode === 'calculateFromTon') modeButtons.ton.classList.add('active-mode');
+            if (newMode === 'calculateFromFlat') modeButtons.flat.classList.add('active-mode');
 
-            // Clear all fields on mode switch to avoid confusion
+            // Clear form and update UI labels/placeholders
             form.reset();
             calculate();
 
-            if (currentMode === 'generateQuote') {
-                primaryInputLabel.textContent = 'Your Rate ($/Mile)';
-                primaryOutputLabel.textContent = 'Quote ($/Ton)';
-                primaryInput.placeholder = 'e.g., 3.50';
-                modeLabel1.classList.add('font-extrabold');
-                modeLabel2.classList.remove('font-extrabold');
-            } else { // calculateRate
-                primaryInputLabel.textContent = 'Offer ($/Ton)';
-                primaryOutputLabel.textContent = 'Your Rate ($/Mile)';
-                primaryInput.placeholder = 'e.g., 150.00';
-                modeLabel2.classList.add('font-extrabold');
-                modeLabel1.classList.remove('font-extrabold');
+            switch (newMode) {
+                case 'generateQuote':
+                    primaryInputLabel.textContent = 'Your Rate ($/Mile)';
+                    primaryOutputLabel.textContent = 'Quote ($/Ton)';
+                    primaryInput.placeholder = 'e.g., 3.50';
+                    break;
+                case 'calculateFromTon':
+                    primaryInputLabel.textContent = 'Offer ($/Ton)';
+                    primaryOutputLabel.textContent = 'Your Rate ($/Mile)';
+                    primaryInput.placeholder = 'e.g., 150.00';
+                    break;
+                case 'calculateFromFlat':
+                    primaryInputLabel.textContent = 'Flat Rate Offer ($)';
+                    primaryOutputLabel.textContent = 'Your Rate ($/Mile)';
+                    primaryInput.placeholder = 'e.g., 3000.00';
+                    break;
             }
         }
 
@@ -158,24 +176,31 @@
             const fscPercent = parseFloat(fscInput.value) || 0;
 
             let lineHaul = 0;
-            let fscAmount = 0;
-            let total = 0;
             let pOutput = 0;
 
-            if (currentMode === 'generateQuote') {
-                // Scenario: We know our rate per mile, we need to quote a cost per ton.
-                const myRatePerMile = pInput;
-                lineHaul = myRatePerMile * miles;
-                fscAmount = lineHaul * (fscPercent / 100);
-                total = lineHaul + fscAmount;
-                pOutput = total > 0 ? total / NET_TONNAGE : 0;
-            } else { // calculateRate
-                // Scenario: Customer gives us a rate per ton, we need to find our rate per mile.
-                const customerRatePerTon = pInput;
-                lineHaul = customerRatePerTon * NET_TONNAGE;
-                fscAmount = lineHaul * (fscPercent / 100);
-                total = lineHaul + fscAmount;
-                pOutput = miles > 0 ? total / miles : 0;
+            switch (currentMode) {
+                case 'generateQuote':
+                    lineHaul = pInput * miles;
+                    break;
+                case 'calculateFromTon':
+                    lineHaul = pInput * NET_TONNAGE;
+                    break;
+                case 'calculateFromFlat':
+                    lineHaul = pInput;
+                    break;
+            }
+
+            const fscAmount = lineHaul * (fscPercent / 100);
+            const total = lineHaul + fscAmount;
+
+            switch (currentMode) {
+                case 'generateQuote':
+                    pOutput = total > 0 ? total / NET_TONNAGE : 0;
+                    break;
+                case 'calculateFromTon':
+                case 'calculateFromFlat':
+                    pOutput = miles > 0 ? total / miles : 0;
+                    break;
             }
 
             // Update UI
@@ -189,7 +214,9 @@
             input.addEventListener('input', calculate);
         });
 
-        modeToggle.addEventListener('change', updateUIMode);
+        modeButtons.quote.addEventListener('click', () => setMode('generateQuote'));
+        modeButtons.ton.addEventListener('click', () => setMode('calculateFromTon'));
+        modeButtons.flat.addEventListener('click', () => setMode('calculateFromFlat'));
 
         resetButton.addEventListener('click', () => {
             form.reset();
@@ -198,16 +225,16 @@
 
         copyButton.addEventListener('click', () => {
             const summary = `
-Freight Quote Summary:
-- Mode: ${currentMode === 'generateQuote' ? 'Generated Quote' : 'Calculated Rate'}
+Freight Calculation Summary:
+- Mode: ${modeButtons[currentMode.replace('calculateFrom', '').toLowerCase()].textContent}
 - Miles: ${milesInput.value || 'N/A'}
 - FSC: ${fscInput.value || 0}%
 ---
 - Final Total: $${finalTotal.value || '0.00'}
 - FSC Amount: $${fscTotal.value || '0.00'}
 ---
-- Quote to Customer: $${currentMode === 'generateQuote' ? primaryOutput.value : primaryInput.value || 'N/A'} / ton
-- Your Rate: $${currentMode === 'calculateRate' ? primaryOutput.value : primaryInput.value || 'N/A'} / mile
+- Your Rate: $${currentMode === 'generateQuote' ? primaryInput.value : primaryOutput.value || 'N/A'} / mile
+- Customer Offer: $${currentMode !== 'generateQuote' ? primaryInput.value : primaryOutput.value || 'N/A'} ${currentMode === 'calculateFromTon' ? '/ ton' : ''}
             `.trim();
 
             copySource.value = summary;
@@ -219,7 +246,7 @@ Freight Quote Summary:
         });
 
         // Initial setup
-        updateUIMode();
+        setMode('generateQuote');
     </script>
 </body>
 </html>
