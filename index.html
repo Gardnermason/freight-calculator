@@ -46,24 +46,10 @@
         /* Menu Styles */
         #side-menu { transition: transform 0.3s ease-in-out; }
         
-        /* Spinner for loading state */
-        .spinner {
-            border: 4px solid rgba(0, 0, 0, 0.1);
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            border-left-color: #3b82f6;
-            animation: spin 1s ease infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
         /* --- FINAL PRINT STYLES --- */
         @media print {
             body, html { background-color: white !important; }
-            #calculator-ui, #side-menu, #menu-overlay, #email-modal { display: none !important; }
+            #calculator-ui, #side-menu, #menu-overlay { display: none !important; }
             .print-area { display: block !important; position: absolute; top: 0; left: 0; width: 100%; }
             .print-area-content { background-color: white !important; color: black !important; -webkit-print-color-adjust: exact; color-adjust: exact; }
             .print-area-content * { color: black !important; }
@@ -200,23 +186,6 @@
         </form>
     </div>
 
-    <!-- Email Modal -->
-    <div id="email-modal" class="fixed inset-0 bg-black bg-opacity-60 z-50 hidden items-center justify-center p-4">
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-2xl w-full max-w-2xl p-6 relative">
-            <h3 class="text-2xl font-bold text-[#003366] dark:text-blue-200 mb-4">Generated Email Draft</h3>
-            <div id="email-loader" class="flex justify-center items-center h-48">
-                <div class="spinner"></div>
-            </div>
-            <div id="email-content" class="hidden">
-                <textarea id="email-draft" rows="10" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-700 dark:text-white"></textarea>
-                <div class="flex justify-end space-x-3 mt-4">
-                    <button id="copy-email-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Copy Email</button>
-                    <button id="close-email-modal-btn" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Printable Area -->
     <div class="print-area hidden">
         <div class="print-area-content p-8">
@@ -278,14 +247,6 @@
         const clearHistoryBtn = document.getElementById('clear-history-btn');
         const feedbackForm = document.getElementById('feedback-form');
         const globalCalcCounter = document.getElementById('global-calc-counter');
-
-        // Email Modal Elements
-        const emailModal = document.getElementById('email-modal');
-        const emailLoader = document.getElementById('email-loader');
-        const emailContent = document.getElementById('email-content');
-        const emailDraft = document.getElementById('email-draft');
-        const copyEmailBtn = document.getElementById('copy-email-btn');
-        const closeEmailModalBtn = document.getElementById('close-email-modal-btn');
 
         const modeButtons = {
             quote: document.getElementById('mode-quote'),
@@ -565,67 +526,13 @@
             window.print();
         });
 
-        // --- Gemini Email Drafting ---
-        emailButton.addEventListener('click', async () => {
-            emailModal.classList.remove('hidden');
-            emailModal.classList.add('flex');
-            emailLoader.classList.remove('hidden');
-            emailContent.classList.add('hidden');
-
+        emailButton.addEventListener('click', () => {
             const { offerValue } = getSummaryText();
-            const prompt = `You are a freight dispatcher for Thompson Transportation. Write a brief, professional, and friendly email to a customer presenting a freight quote. Be concise.
+            const subject = "Freight Quote";
+            const body = `Hello,\n\nFollowing up on your request, here is our all-inclusive quote for the lane:\n\nRate: ${offerValue}\n\nPlease let us know if you have any questions.\n\nThank you,\nThompson Transportation`;
             
-            The all-inclusive rate we can offer for this lane is ${offerValue}.
-            
-            Please present this quote clearly. Let them know this is an all-in rate and encourage them to reach out with any questions. Sign off as 'Thompson Transportation'.`;
-
-            try {
-                let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
-                const payload = { contents: chatHistory };
-                const apiKey = ""; // This will be handled by the environment
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-                
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                
-                if (!response.ok) {
-                    // Handle non-200 responses
-                    const errorBody = await response.json();
-                    console.error("API Error:", errorBody);
-                    throw new Error(`API request failed with status ${response.status}`);
-                }
-
-                const result = await response.json();
-                
-                if (result.candidates && result.candidates.length > 0 && result.candidates[0].content.parts.length > 0) {
-                    const text = result.candidates[0].content.parts[0].text;
-                    emailDraft.value = text;
-                } else {
-                    emailDraft.value = "Sorry, there was an error generating the email draft. The response was empty. Please try again.";
-                }
-            } catch (error) {
-                console.error("Error calling Gemini API:", error);
-                emailDraft.value = "Sorry, could not connect to the AI service. Please check your connection and try again.";
-            } finally {
-                emailLoader.classList.add('hidden');
-                emailContent.classList.remove('hidden');
-            }
-        });
-
-        closeEmailModalBtn.addEventListener('click', () => {
-            emailModal.classList.add('hidden');
-            emailModal.classList.remove('flex');
-        });
-
-        copyEmailBtn.addEventListener('click', () => {
-            emailDraft.select();
-            document.execCommand('copy');
-            copyNotification.textContent = 'Email draft copied!';
-            copyNotification.style.opacity = '1';
-            setTimeout(() => { copyNotification.style.opacity = '0'; }, 2000);
+            const mailtoLink = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            window.location.href = mailtoLink;
         });
 
         // --- Initial Setup ---
