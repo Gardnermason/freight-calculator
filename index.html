@@ -30,9 +30,22 @@
         .dark .input-label { color: #aaccff; }
         .output-label { font-family: 'Merriweather', serif; font-size: 1.5rem; font-weight: bold; color: #003366; }
         .dark .output-label { color: #aaccff; }
-        .form-input:focus { outline: none; box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.5); border-color: #007BFF; }
-        .output-field { background-color: #e0e7ff; font-weight: bold; }
-        .dark .output-field { background-color: #1e3a5f; color: #e0e7ff; }
+        .form-input:focus { outline: none; box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.5); border-color: #007BFF !important; }
+        
+        /* New robust styles for input fields */
+        .editable-field {
+            background-color: white;
+            color: #111827; /* gray-900 */
+            border-color: #d1d5db; /* gray-300 */
+        }
+        .dark .editable-field {
+            background-color: #374151; /* gray-700 */
+            color: white;
+            border-color: #4b5563; /* gray-600 */
+        }
+
+        .output-field { background-color: #e0e7ff; font-weight: bold; border-color: #d1d5db; }
+        .dark .output-field { background-color: #1e3a5f; color: #e0e7ff; border-color: #4b5563; }
         .mode-btn {
             transition: all 0.2s ease-in-out;
             background-color: #dbeafe;
@@ -55,33 +68,11 @@
         
         /* --- FINAL PRINT STYLES --- */
         @media print {
-            /* Force the entire page background to white */
-            body, html {
-                background-color: white !important;
-            }
-            /* Hide the main calculator UI */
-            #calculator-ui {
-                display: none !important;
-            }
-            /* Make the print area the only visible thing */
-            .print-area {
-                display: block !important;
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-            }
-            /* Ensure the print content itself has a white background and black text */
-            .print-area-content {
-                background-color: white !important;
-                color: black !important;
-                -webkit-print-color-adjust: exact; /* Force color rendering */
-                color-adjust: exact;
-            }
-            /* Force all text within the print area to be black */
-            .print-area-content * {
-                color: black !important;
-            }
+            body, html { background-color: white !important; }
+            #calculator-ui { display: none !important; }
+            .print-area { display: block !important; position: absolute; top: 0; left: 0; width: 100%; }
+            .print-area-content { background-color: white !important; color: black !important; -webkit-print-color-adjust: exact; color-adjust: exact; }
+            .print-area-content * { color: black !important; }
         }
     </style>
 </head>
@@ -117,29 +108,29 @@
             <div id="primaryInputSection">
                 <div class="flex items-center justify-between space-x-4">
                     <label for="primaryInput" id="primaryInputLabel" class="input-label">Your Rate ($/Mile)</label>
-                    <div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-lg text-gray-500">$</span><input type="number" id="primaryInput" step="0.01" placeholder="e.g., 3.50" class="form-input w-48 p-3 pl-7 text-lg text-right font-semibold bg-gray-50 dark:bg-gray-700 dark:text-white border-2 border-gray-400 dark:border-gray-600 rounded-lg shadow-inner"></div>
+                    <div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-lg text-gray-500">$</span><input type="number" id="primaryInput" step="0.01" placeholder="e.g., 3.50" class="form-input editable-field w-48 p-3 pl-7 text-lg text-right font-semibold border-2 rounded-lg shadow-inner"></div>
                 </div>
             </div>
             <div class="flex items-center justify-between space-x-4">
                 <label for="miles" class="input-label">Total Miles</label>
-                <input type="number" id="miles" step="0.1" placeholder="e.g., 500" class="form-input w-48 p-3 text-lg text-right font-semibold bg-gray-50 dark:bg-gray-700 dark:text-white border-2 border-gray-400 dark:border-gray-600 rounded-lg shadow-inner">
+                <input type="number" id="miles" step="0.1" placeholder="e.g., 500" class="form-input editable-field w-48 p-3 text-lg text-right font-semibold border-2 rounded-lg shadow-inner">
             </div>
             <div class="flex items-center justify-between space-x-4">
                 <label for="fsc" class="input-label">FSC (%)</label>
-                <div class="relative"><input type="number" id="fsc" placeholder="e.g., 10" class="form-input w-48 p-3 pr-8 text-lg text-right font-semibold bg-gray-50 dark:bg-gray-700 dark:text-white border-2 border-gray-400 dark:border-gray-600 rounded-lg shadow-inner"><span class="absolute right-3 top-1/2 -translate-y-1/2 text-lg text-gray-500">%</span></div>
+                <div class="relative"><input type="number" id="fsc" placeholder="e.g., 10" class="form-input editable-field w-48 p-3 pr-8 text-lg text-right font-semibold border-2 rounded-lg shadow-inner"><span class="absolute right-3 top-1/2 -translate-y-1/2 text-lg text-gray-500">%</span></div>
             </div>
             <hr class="border-t-2 border-gray-300 dark:border-gray-600 my-5">
             <div class="flex items-center justify-between space-x-4">
                 <label for="primaryOutput" id="primaryOutputLabel" class="output-label">Quote ($/Ton)</label>
-                <div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-lg text-gray-500">$</span><input type="text" id="primaryOutput" readonly class="form-input output-field w-48 p-3 pl-7 text-lg text-right border-2 border-gray-400 dark:border-gray-600 rounded-lg shadow-inner cursor-not-allowed"></div>
+                <div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-lg text-gray-500">$</span><input type="text" id="primaryOutput" readonly class="form-input output-field w-48 p-3 pl-7 text-lg text-right border-2 rounded-lg shadow-inner cursor-not-allowed"></div>
             </div>
             <div class="flex items-center justify-between space-x-4">
                 <label for="fscTotal" class="output-label">FSC Total</label>
-                <div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-lg text-gray-500">$</span><input type="text" id="fscTotal" readonly class="form-input output-field w-48 p-3 pl-7 text-lg text-right border-2 border-gray-400 dark:border-gray-600 rounded-lg shadow-inner cursor-not-allowed"></div>
+                <div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-lg text-gray-500">$</span><input type="text" id="fscTotal" readonly class="form-input output-field w-48 p-3 pl-7 text-lg text-right border-2 rounded-lg shadow-inner cursor-not-allowed"></div>
             </div>
             <div class="flex items-center justify-between space-x-4">
                 <label for="finalTotal" class="output-label">Final Total</label>
-                <div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-lg text-gray-500">$</span><input type="text" id="finalTotal" readonly class="form-input output-field w-48 p-3 pl-7 text-lg text-right border-2 border-gray-400 dark:border-gray-600 rounded-lg shadow-inner cursor-not-allowed"></div>
+                <div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-lg text-gray-500">$</span><input type="text" id="finalTotal" readonly class="form-input output-field w-48 p-3 pl-7 text-lg text-right border-2 rounded-lg shadow-inner cursor-not-allowed"></div>
             </div>
             <div class="flex items-center justify-center space-x-2 pt-5">
                 <button type="button" id="printButton" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-transform transform hover:scale-105">Print</button>
