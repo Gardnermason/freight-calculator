@@ -65,6 +65,12 @@
                 left: 0;
                 top: 0;
                 width: 100%;
+                background-color: white !important; /* Ensure white background */
+                -webkit-print-color-adjust: exact; /* Force color printing in Chrome/Safari */
+                color-adjust: exact; /* Standard */
+            }
+            .print-area h1, .print-area h2, .print-area p, .print-area span, .print-area strong {
+                color: black !important; /* Ensure all text is black for printing */
             }
         }
     </style>
