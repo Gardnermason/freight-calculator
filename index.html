@@ -53,13 +53,17 @@
             color: #0d1a26;
         }
         
-        /* --- NEW, MORE ROBUST PRINT STYLES --- */
+        /* --- FINAL PRINT STYLES --- */
         @media print {
-            /* Hide the main calculator interface completely */
+            /* Force the entire page background to white */
+            body, html {
+                background-color: white !important;
+            }
+            /* Hide the main calculator UI */
             #calculator-ui {
                 display: none !important;
             }
-            /* Make the print area visible and take up the whole page */
+            /* Make the print area the only visible thing */
             .print-area {
                 display: block !important;
                 position: absolute;
@@ -67,14 +71,14 @@
                 left: 0;
                 width: 100%;
             }
-            /* Force a white background and black text for the printout */
+            /* Ensure the print content itself has a white background and black text */
             .print-area-content {
                 background-color: white !important;
                 color: black !important;
-                -webkit-print-color-adjust: exact; /* Ensures colors are applied */
+                -webkit-print-color-adjust: exact; /* Force color rendering */
                 color-adjust: exact;
             }
-            /* Ensure all text inside the print area is black */
+            /* Force all text within the print area to be black */
             .print-area-content * {
                 color: black !important;
             }
