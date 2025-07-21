@@ -46,10 +46,24 @@
         /* Menu Styles */
         #side-menu { transition: transform 0.3s ease-in-out; }
         
+        /* Spinner for loading state */
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #3b82f6;
+            animation: spin 1s ease infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         /* --- FINAL PRINT STYLES --- */
         @media print {
             body, html { background-color: white !important; }
-            #calculator-ui, #side-menu, #menu-overlay { display: none !important; }
+            #calculator-ui, #side-menu, #menu-overlay, #email-modal { display: none !important; }
             .print-area { display: block !important; position: absolute; top: 0; left: 0; width: 100%; }
             .print-area-content { background-color: white !important; color: black !important; -webkit-print-color-adjust: exact; color-adjust: exact; }
             .print-area-content * { color: black !important; }
@@ -63,25 +77,34 @@
 
     <!-- Side Menu -->
     <div id="side-menu" class="fixed top-0 left-0 h-full w-80 bg-white dark:bg-gray-800 shadow-xl z-40 transform -translate-x-full">
-        <div class="p-5">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold text-[#003366] dark:text-blue-200">Menu</h2>
-                <button id="close-menu-btn" class="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
-                    <svg class="w-6 h-6 text-gray-700 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
+        <div class="p-5 flex flex-col h-full">
+            <div>
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-[#003366] dark:text-blue-200">Menu</h2>
+                    <button id="close-menu-btn" class="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                        <svg class="w-6 h-6 text-gray-700 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+                <nav id="main-menu">
+                    <a href="#" id="history-menu-btn" class="flex items-center p-3 text-lg text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Recent Calculations
+                    </a>
+                    <a href="#" id="feedback-menu-btn" class="flex items-center p-3 text-lg text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                         <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+                        Send Feedback
+                    </a>
+                </nav>
             </div>
-            <nav id="main-menu">
-                <a href="#" id="history-menu-btn" class="flex items-center p-3 text-lg text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                    <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    Recent Calculations
-                </a>
-                <a href="#" id="feedback-menu-btn" class="flex items-center p-3 text-lg text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                     <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
-                    Send Feedback
-                </a>
-            </nav>
+            <!-- Spacer -->
+            <div class="flex-grow"></div>
+            <!-- Global Stats -->
+            <div class="mt-auto p-4 border-t border-gray-200 dark:border-gray-700">
+                <h3 class="text-lg font-semibold text-center text-[#003366] dark:text-blue-200">Global Calculation Counter</h3>
+                <p id="global-calc-counter" class="text-4xl font-bold text-center text-blue-600 dark:text-blue-400 mt-2">...</p>
+            </div>
             <!-- History View -->
-            <div id="history-view" class="hidden">
+            <div id="history-view" class="hidden absolute inset-0 bg-white dark:bg-gray-800 p-5">
                  <div class="flex justify-between items-center mb-4">
                     <button id="back-to-menu-hist" class="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
                         <svg class="w-6 h-6 text-gray-700 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
@@ -93,7 +116,7 @@
                 <button id="clear-history-btn" class="w-full mt-4 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Clear History</button>
             </div>
             <!-- Feedback View -->
-            <div id="feedback-view" class="hidden">
+            <div id="feedback-view" class="hidden absolute inset-0 bg-white dark:bg-gray-800 p-5">
                 <div class="flex justify-between items-center mb-4">
                     <button id="back-to-menu-feed" class="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
                         <svg class="w-6 h-6 text-gray-700 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
@@ -168,12 +191,30 @@
                 <div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-lg text-gray-500">$</span><input type="text" id="finalTotal" readonly class="form-input output-field w-48 p-3 pl-7 text-lg text-right border-2 rounded-lg shadow-inner cursor-not-allowed"></div>
             </div>
             <div class="flex items-center justify-center space-x-2 pt-5">
-                <button type="button" id="printButton" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-transform transform hover:scale-105">Print</button>
+                <button type="button" id="emailButton" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-transform transform hover:scale-105">Email</button>
+                <button type="button" id="printButton" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-transform transform hover:scale-105 hidden">Print</button>
                 <button type="button" id="copyButton" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-transform transform hover:scale-105">Copy</button>
                 <button type="button" id="resetButton" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-transform transform hover:scale-105">Reset</button>
             </div>
-            <div id="copyNotification" class="text-center text-green-700 dark:text-green-400 font-semibold mt-2 h-6 opacity-0 transition-opacity duration-300">Copied to clipboard!</div>
+            <div id="copyNotification" class="text-center text-green-700 dark:text-green-400 font-semibold mt-2 h-6 opacity-0 transition-opacity duration-300"></div>
         </form>
+    </div>
+
+    <!-- Email Modal -->
+    <div id="email-modal" class="fixed inset-0 bg-black bg-opacity-60 z-50 hidden items-center justify-center p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-2xl w-full max-w-2xl p-6 relative">
+            <h3 class="text-2xl font-bold text-[#003366] dark:text-blue-200 mb-4">Generated Email Draft</h3>
+            <div id="email-loader" class="flex justify-center items-center h-48">
+                <div class="spinner"></div>
+            </div>
+            <div id="email-content" class="hidden">
+                <textarea id="email-draft" rows="10" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-700 dark:text-white"></textarea>
+                <div class="flex justify-end space-x-3 mt-4">
+                    <button id="copy-email-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Copy Email</button>
+                    <button id="close-email-modal-btn" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded">Close</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Printable Area -->
@@ -195,8 +236,14 @@
     </div>
     
     <textarea id="copySource" class="sr-only"></textarea>
+    
+    <script type="module">
+        // --- Firebase SDK Imports ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, onSnapshot, setDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    <script>
+        // --- DOM Element Selection ---
         const form = document.getElementById('rateCalculatorForm');
         const primaryInput = document.getElementById('primaryInput');
         const primaryInputLabel = document.getElementById('primaryInputLabel');
@@ -208,6 +255,7 @@
         const copyButton = document.getElementById('copyButton');
         const resetButton = document.getElementById('resetButton');
         const printButton = document.getElementById('printButton');
+        const emailButton = document.getElementById('emailButton');
         const copyNotification = document.getElementById('copyNotification');
         const copySource = document.getElementById('copySource');
         const themeToggleBtn = document.getElementById('theme-toggle');
@@ -229,6 +277,15 @@
         const historyList = document.getElementById('history-list');
         const clearHistoryBtn = document.getElementById('clear-history-btn');
         const feedbackForm = document.getElementById('feedback-form');
+        const globalCalcCounter = document.getElementById('global-calc-counter');
+
+        // Email Modal Elements
+        const emailModal = document.getElementById('email-modal');
+        const emailLoader = document.getElementById('email-loader');
+        const emailContent = document.getElementById('email-content');
+        const emailDraft = document.getElementById('email-draft');
+        const copyEmailBtn = document.getElementById('copy-email-btn');
+        const closeEmailModalBtn = document.getElementById('close-email-modal-btn');
 
         const modeButtons = {
             quote: document.getElementById('mode-quote'),
@@ -239,6 +296,48 @@
         const NET_TONNAGE = 23;
         let currentMode = 'generateQuote';
         let calculationHistory = JSON.parse(localStorage.getItem('thompsonCalcHistory')) || [];
+        let db; // Firestore instance
+
+        // --- Firebase Initialization ---
+        async function initFirebase() {
+            try {
+                const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+                
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                const auth = getAuth(app);
+                
+                if (typeof __initial_auth_token !== 'undefined') {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+                
+                const counterRef = doc(db, `/artifacts/${appId}/public/data/stats/counter`);
+                onSnapshot(counterRef, (docSnap) => {
+                    if (docSnap.exists()) {
+                        globalCalcCounter.textContent = docSnap.data().calculationCount.toLocaleString();
+                    } else {
+                        setDoc(counterRef, { calculationCount: 0 });
+                    }
+                });
+            } catch (error) {
+                console.error("Firebase initialization failed:", error);
+                globalCalcCounter.textContent = 'N/A';
+            }
+        }
+
+        async function incrementGlobalCounter() {
+            if (!db) return;
+            const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+            const counterRef = doc(db, `/artifacts/${appId}/public/data/stats/counter`);
+            try {
+                await updateDoc(counterRef, { calculationCount: increment(1) });
+            } catch (error) {
+                await setDoc(counterRef, { calculationCount: increment(1) }, { merge: true });
+            }
+        }
 
         // --- Dark Mode Logic ---
         function updateThemeIcon(isDarkMode) {
@@ -262,7 +361,6 @@
         function closeMenu() {
             sideMenu.classList.add('-translate-x-full');
             menuOverlay.classList.add('hidden');
-            // Reset to main menu view when closing
             mainMenu.classList.remove('hidden');
             historyView.classList.add('hidden');
             feedbackView.classList.add('hidden');
@@ -272,44 +370,26 @@
         closeMenuBtn.addEventListener('click', closeMenu);
         menuOverlay.addEventListener('click', closeMenu);
 
-        historyMenuBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            mainMenu.classList.add('hidden');
-            historyView.classList.remove('hidden');
-            renderHistory();
-        });
-
-        feedbackMenuBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            mainMenu.classList.add('hidden');
-            feedbackView.classList.remove('hidden');
-        });
-
-        backToMenuHist.addEventListener('click', () => {
-            historyView.classList.add('hidden');
-            mainMenu.classList.remove('hidden');
-        });
-        
-        backToMenuFeed.addEventListener('click', () => {
-            feedbackView.classList.add('hidden');
-            mainMenu.classList.remove('hidden');
-        });
+        historyMenuBtn.addEventListener('click', (e) => { e.preventDefault(); mainMenu.classList.add('hidden'); historyView.classList.remove('hidden'); renderHistory(); });
+        feedbackMenuBtn.addEventListener('click', (e) => { e.preventDefault(); mainMenu.classList.add('hidden'); feedbackView.classList.remove('hidden'); });
+        backToMenuHist.addEventListener('click', () => { historyView.classList.add('hidden'); mainMenu.classList.remove('hidden'); });
+        backToMenuFeed.addEventListener('click', () => { feedbackView.classList.add('hidden'); mainMenu.classList.remove('hidden'); });
 
         // --- History Logic ---
         function saveCalculation() {
-            if (!parseFloat(primaryInput.value) && !parseFloat(milesInput.value)) return;
-
-            const calculation = {
-                mode: currentMode,
-                primaryInput: primaryInput.value,
-                miles: milesInput.value,
-                fsc: fscInput.value,
-                timestamp: new Date().toISOString()
-            };
-            
-            calculationHistory.unshift(calculation);
-            calculationHistory = calculationHistory.slice(0, 5);
-            localStorage.setItem('thompsonCalcHistory', JSON.stringify(calculationHistory));
+            const pInput = parseFloat(primaryInput.value) || 0;
+            const miles = parseFloat(milesInput.value) || 0;
+            if (pInput > 0 && miles > 0) {
+                const calculation = { mode: currentMode, primaryInput: primaryInput.value, miles: milesInput.value, fsc: fscInput.value, timestamp: new Date().toISOString() };
+                if (calculationHistory.length > 0) {
+                    const lastCalc = calculationHistory[0];
+                    if (lastCalc.mode === calculation.mode && lastCalc.primaryInput === calculation.primaryInput && lastCalc.miles === calculation.miles && lastCalc.fsc === calculation.fsc) return;
+                }
+                calculationHistory.unshift(calculation);
+                calculationHistory = calculationHistory.slice(0, 5);
+                localStorage.setItem('thompsonCalcHistory', JSON.stringify(calculationHistory));
+                incrementGlobalCounter();
+            }
         }
 
         function renderHistory() {
@@ -323,14 +403,8 @@
                 const modeKey = calc.mode.replace('generate', '').replace('calculateFrom', '').toLowerCase();
                 const button = document.createElement('button');
                 button.className = 'w-full text-left p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700';
-                button.innerHTML = `
-                    <div class="font-bold text-gray-800 dark:text-gray-200">${modeButtons[modeKey].textContent}</div>
-                    <div class="text-sm text-gray-600 dark:text-gray-400">Rate: ${yourRateValue} | Offer: ${offerValue}</div>
-                `;
-                button.onclick = () => {
-                    loadFromHistory(index);
-                    closeMenu();
-                };
+                button.innerHTML = `<div class="font-bold text-gray-800 dark:text-gray-200">${modeButtons[modeKey].textContent}</div><div class="text-sm text-gray-600 dark:text-gray-400">Rate: ${yourRateValue} | Offer: ${offerValue}</div>`;
+                button.onclick = () => { loadFromHistory(index); closeMenu(); };
                 historyList.appendChild(button);
             });
         }
@@ -344,11 +418,7 @@
             calculate();
         }
 
-        clearHistoryBtn.addEventListener('click', () => {
-            calculationHistory = [];
-            localStorage.removeItem('thompsonCalcHistory');
-            renderHistory();
-        });
+        clearHistoryBtn.addEventListener('click', () => { calculationHistory = []; localStorage.removeItem('thompsonCalcHistory'); renderHistory(); });
 
         // --- Feedback Logic ---
         feedbackForm.addEventListener('submit', (e) => {
@@ -358,17 +428,11 @@
                 const recipient = 'mgardner@thompsontrans.net';
                 const subject = 'Feedback for Freight Calculator';
                 const body = encodeURIComponent(message);
-                
-                const mailtoLink = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${body}`;
-                window.location.href = mailtoLink;
-
+                window.location.href = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${body}`;
                 feedbackForm.innerHTML = `<p class="text-center text-lg text-green-600 dark:text-green-400">Opening your email client...</p>`;
                 setTimeout(() => {
                     closeMenu();
-                    feedbackForm.innerHTML = `
-                        <textarea id="feedback-message" placeholder="Your feedback..." rows="5" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700"></textarea>
-                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Send</button>
-                    `;
+                    feedbackForm.innerHTML = `<textarea id="feedback-message" placeholder="Your feedback..." rows="5" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700"></textarea><button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Send</button>`;
                 }, 2500);
             }
         });
@@ -377,6 +441,9 @@
         function setMode(newMode) {
             currentMode = newMode;
             Object.values(modeButtons).forEach(btn => btn.classList.remove('active-mode'));
+            emailButton.classList.toggle('hidden', newMode !== 'generateQuote');
+            printButton.classList.toggle('hidden', newMode === 'generateQuote');
+
             if (newMode === 'generateQuote') modeButtons.quote.classList.add('active-mode');
             if (newMode === 'calculateFromTon') modeButtons.ton.classList.add('active-mode');
             if (newMode === 'calculateFromFlat') modeButtons.flat.classList.add('active-mode');
@@ -407,60 +474,42 @@
             const pInput = parseFloat(primaryInput.value) || 0;
             const miles = parseFloat(milesInput.value) || 0;
             const fscPercent = parseFloat(fscInput.value) || 0;
-
-            let lineHaul = 0;
-            let pOutput = 0;
-
+            let lineHaul = 0, pOutput = 0;
             switch (currentMode) {
                 case 'generateQuote': lineHaul = pInput * miles; break;
                 case 'calculateFromTon': lineHaul = pInput * NET_TONNAGE; break;
                 case 'calculateFromFlat': lineHaul = pInput; break;
             }
-
             const fscAmount = lineHaul * (fscPercent / 100);
             const total = lineHaul + fscAmount;
-
             switch (currentMode) {
                 case 'generateQuote': pOutput = total > 0 ? total / NET_TONNAGE : 0; break;
                 case 'calculateFromTon':
                 case 'calculateFromFlat': pOutput = miles > 0 ? total / miles : 0; break;
             }
-
             primaryOutput.value = pOutput > 0 ? pOutput.toFixed(2) : '';
             fscTotal.value = fscAmount > 0 ? fscAmount.toFixed(2) : '';
             finalTotal.value = total > 0 ? total.toFixed(2) : '';
         }
 
         function getSummaryText(calcData = null) {
-            const data = calcData || {
-                mode: currentMode,
-                primaryInput: primaryInput.value,
-                miles: milesInput.value,
-                fsc: fscInput.value
-            };
-            
+            const data = calcData || { mode: currentMode, primaryInput: primaryInput.value, miles: milesInput.value, fsc: fscInput.value };
             const pInput = parseFloat(data.primaryInput) || 0;
             const miles = parseFloat(data.miles) || 0;
             const fscPercent = parseFloat(data.fsc) || 0;
-            
-            let lineHaul = 0;
-            let pOutput = 0;
-            
+            let lineHaul = 0, pOutput = 0;
             switch (data.mode) {
                 case 'generateQuote': lineHaul = pInput * miles; break;
                 case 'calculateFromTon': lineHaul = pInput * NET_TONNAGE; break;
                 case 'calculateFromFlat': lineHaul = pInput; break;
             }
             const total = lineHaul * (1 + fscPercent / 100);
-            
             switch (data.mode) {
                 case 'generateQuote': pOutput = total > 0 ? total / NET_TONNAGE : 0; break;
                 case 'calculateFromTon':
                 case 'calculateFromFlat': pOutput = miles > 0 ? total / miles : 0; break;
             }
-
             let yourRateLabel, yourRateValue, offerLabel, offerValue;
-
             if (data.mode === 'generateQuote') {
                 yourRateLabel = 'Your Rate:';
                 yourRateValue = `$${pInput.toFixed(2)} / mile`;
@@ -472,7 +521,7 @@
                 offerLabel = 'Customer Offer:';
                 if (data.mode === 'calculateFromTon') {
                     offerValue = `$${pInput.toFixed(2)} / ton`;
-                } else { // calculateFromFlat
+                } else {
                     offerValue = `$${pInput.toFixed(2)} (Flat)`;
                 }
             }
@@ -485,32 +534,17 @@
         modeButtons.ton.addEventListener('click', () => setMode('calculateFromTon'));
         modeButtons.flat.addEventListener('click', () => setMode('calculateFromFlat'));
         resetButton.addEventListener('click', () => { form.reset(); calculate(); });
-
-        // Add a small delay before saving to avoid saving incomplete calculations
         let saveTimeout;
-        form.addEventListener('input', () => {
-            clearTimeout(saveTimeout);
-            saveTimeout = setTimeout(saveCalculation, 1500);
-        });
+        form.addEventListener('input', () => { clearTimeout(saveTimeout); saveTimeout = setTimeout(saveCalculation, 1500); });
 
         copyButton.addEventListener('click', () => {
             const { yourRateLabel, yourRateValue, offerLabel, offerValue } = getSummaryText();
             const modeKey = currentMode.replace('generate', '').replace('calculateFrom', '').toLowerCase();
-            const summary = `
-Freight Calculation Summary:
-- Mode: ${modeButtons[modeKey].textContent}
-- Miles: ${milesInput.value || 'N/A'}
-- FSC: ${fscInput.value || 0}%
----
-- Final Total: $${finalTotal.value || '0.00'}
-- FSC Amount: $${fscTotal.value || '0.00'}
----
-- ${yourRateLabel} ${yourRateValue}
-- ${offerLabel} ${offerValue}
-            `.trim();
+            const summary = `Freight Calculation Summary:\n- Mode: ${modeButtons[modeKey].textContent}\n- Miles: ${milesInput.value || 'N/A'}\n- FSC: ${fscInput.value || 0}%\n---\n- Final Total: $${finalTotal.value || '0.00'}\n- FSC Amount: $${fscTotal.value || '0.00'}\n---\n- ${yourRateLabel} ${yourRateValue}\n- ${offerLabel} ${offerValue}`.trim();
             copySource.value = summary;
             copySource.select();
             document.execCommand('copy');
+            copyNotification.textContent = 'Copied to clipboard!';
             copyNotification.style.opacity = '1';
             setTimeout(() => { copyNotification.style.opacity = '0'; }, 2000);
         });
@@ -522,19 +556,73 @@ Freight Calculation Summary:
             document.getElementById('print-mode').textContent = modeButtons[modeKey].textContent;
             document.getElementById('print-miles').textContent = milesInput.value || 'N/A';
             document.getElementById('print-fsc').textContent = `${fscInput.value || 0}%`;
-            
             document.querySelector('#print-your-rate-row strong').textContent = yourRateLabel;
             document.getElementById('print-your-rate').textContent = yourRateValue;
-            
             document.querySelector('#print-offer-row strong').textContent = offerLabel;
             document.getElementById('print-offer').textContent = offerValue;
-            
             document.getElementById('print-fsc-total').textContent = `$${fscTotal.value || '0.00'}`;
             document.getElementById('print-final-total').textContent = `$${finalTotal.value || '0.00'}`;
             window.print();
         });
 
+        // --- Gemini Email Drafting ---
+        emailButton.addEventListener('click', async () => {
+            emailModal.classList.remove('hidden');
+            emailModal.classList.add('flex');
+            emailLoader.classList.remove('hidden');
+            emailContent.classList.add('hidden');
+
+            const { yourRateValue, offerValue } = getSummaryText();
+            const prompt = `You are a freight dispatcher for Thompson Transportation. Write a brief, professional, and friendly email to a customer presenting a freight quote. Be concise. Here is the data for the quote:
+            - Our Rate: ${yourRateValue}
+            - Quote per Ton: ${offerValue}
+            - Total Miles: ${milesInput.value || 'N/A'}
+            - Final Total All-In: $${finalTotal.value || '0.00'}
+            
+            Please present this clearly to the customer. Sign off as 'Thompson Transportation'.`;
+
+            try {
+                let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
+                const payload = { contents: chatHistory };
+                const apiKey = ""; 
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+                
+                if (result.candidates && result.candidates.length > 0) {
+                    const text = result.candidates[0].content.parts[0].text;
+                    emailDraft.value = text;
+                } else {
+                    emailDraft.value = "Sorry, there was an error generating the email draft. Please try again.";
+                }
+            } catch (error) {
+                console.error("Error calling Gemini API:", error);
+                emailDraft.value = "Sorry, could not connect to the AI service. Please check your connection and try again.";
+            } finally {
+                emailLoader.classList.add('hidden');
+                emailContent.classList.remove('hidden');
+            }
+        });
+
+        closeEmailModalBtn.addEventListener('click', () => {
+            emailModal.classList.add('hidden');
+            emailModal.classList.remove('flex');
+        });
+
+        copyEmailBtn.addEventListener('click', () => {
+            emailDraft.select();
+            document.execCommand('copy');
+            copyNotification.textContent = 'Email draft copied!';
+            copyNotification.style.opacity = '1';
+            setTimeout(() => { copyNotification.style.opacity = '0'; }, 2000);
+        });
+
         // --- Initial Setup ---
+        initFirebase();
         setMode('generateQuote');
         updateThemeIcon(document.documentElement.classList.contains('dark'));
     </script>
