@@ -151,8 +151,8 @@
             <p class="mb-2 text-lg"><strong class="w-48 inline-block">Total Miles:</strong> <span id="print-miles"></span></p>
             <p class="mb-2 text-lg"><strong class="w-48 inline-block">FSC (%):</strong> <span id="print-fsc"></span></p>
             <hr class="my-4">
-            <p class="mb-2 text-lg"><strong class="w-48 inline-block" id="print-your-rate-label">Your Rate:</strong> <span id="print-your-rate"></span></p>
-            <p class="mb-2 text-lg"><strong class="w-48 inline-block" id="print-offer-label">Customer Offer:</strong> <span id="print-offer"></span></p>
+            <p class="mb-2 text-lg" id="print-your-rate-row"><strong class="w-48 inline-block"></strong> <span id="print-your-rate"></span></p>
+            <p class="mb-2 text-lg" id="print-offer-row"><strong class="w-48 inline-block"></strong> <span id="print-offer"></span></p>
             <hr class="my-4">
             <p class="mb-2 text-lg"><strong class="w-48 inline-block">FSC Total:</strong> <span id="print-fsc-total"></span></p>
             <p class="text-xl font-bold mt-4"><strong class="w-48 inline-block">Final Total:</strong> <span id="print-final-total"></span></p>
@@ -260,6 +260,27 @@
             finalTotal.value = total > 0 ? total.toFixed(2) : '';
         }
 
+        function getSummaryText() {
+            let yourRateLabel, yourRateValue, offerLabel, offerValue;
+
+            if (currentMode === 'generateQuote') {
+                yourRateLabel = 'Your Rate:';
+                yourRateValue = `$${primaryInput.value || 'N/A'} / mile`;
+                offerLabel = 'Quote to Customer:';
+                offerValue = `$${primaryOutput.value || 'N/A'} / ton`;
+            } else {
+                yourRateLabel = 'Your Calculated Rate:';
+                yourRateValue = `$${primaryOutput.value || 'N/A'} / mile`;
+                offerLabel = 'Customer Offer:';
+                if (currentMode === 'calculateFromTon') {
+                    offerValue = `$${primaryInput.value || 'N/A'} / ton`;
+                } else { // calculateFromFlat
+                    offerValue = `$${primaryInput.value || 'N/A'} (Flat)`;
+                }
+            }
+            return { yourRateLabel, yourRateValue, offerLabel, offerValue };
+        }
+
         // --- Event Listeners ---
         [primaryInput, milesInput, fscInput].forEach(input => input.addEventListener('input', calculate));
         modeButtons.quote.addEventListener('click', () => setMode('generateQuote'));
@@ -268,7 +289,8 @@
         resetButton.addEventListener('click', () => { form.reset(); calculate(); });
 
         copyButton.addEventListener('click', () => {
-             const summary = `
+            const { yourRateLabel, yourRateValue, offerLabel, offerValue } = getSummaryText();
+            const summary = `
 Freight Calculation Summary:
 - Mode: ${modeButtons[currentMode.replace('calculateFrom', '').toLowerCase()].textContent}
 - Miles: ${milesInput.value || 'N/A'}
@@ -277,8 +299,8 @@ Freight Calculation Summary:
 - Final Total: $${finalTotal.value || '0.00'}
 - FSC Amount: $${fscTotal.value || '0.00'}
 ---
-- Your Rate: $${currentMode === 'generateQuote' ? primaryInput.value : primaryOutput.value || 'N/A'} / mile
-- Customer Offer: $${currentMode !== 'generateQuote' ? primaryInput.value : primaryOutput.value || 'N/A'} ${currentMode === 'calculateFromTon' ? '/ ton' : ''}
+- ${yourRateLabel} ${yourRateValue}
+- ${offerLabel} ${offerValue}
             `.trim();
             copySource.value = summary;
             copySource.select();
@@ -288,13 +310,19 @@ Freight Calculation Summary:
         });
 
         printButton.addEventListener('click', () => {
+            const { yourRateLabel, yourRateValue, offerLabel, offerValue } = getSummaryText();
             // Populate the print area
             document.getElementById('print-date').textContent = new Date().toLocaleDateString();
             document.getElementById('print-mode').textContent = modeButtons[currentMode.replace('calculateFrom', '').toLowerCase()].textContent;
             document.getElementById('print-miles').textContent = milesInput.value || 'N/A';
             document.getElementById('print-fsc').textContent = `${fscInput.value || 0}%`;
-            document.getElementById('print-your-rate').textContent = `$${currentMode === 'generateQuote' ? primaryInput.value : primaryOutput.value || 'N/A'} / mile`;
-            document.getElementById('print-offer').textContent = `$${currentMode !== 'generateQuote' ? primaryInput.value : primaryOutput.value || 'N/A'} ${currentMode === 'calculateFromTon' ? '/ ton' : ''}`;
+            
+            document.querySelector('#print-your-rate-row strong').textContent = yourRateLabel;
+            document.getElementById('print-your-rate').textContent = yourRateValue;
+            
+            document.querySelector('#print-offer-row strong').textContent = offerLabel;
+            document.getElementById('print-offer').textContent = offerValue;
+            
             document.getElementById('print-fsc-total').textContent = `$${fscTotal.value || '0.00'}`;
             document.getElementById('print-final-total').textContent = `$${finalTotal.value || '0.00'}`;
             window.print();
