@@ -572,14 +572,12 @@
             emailLoader.classList.remove('hidden');
             emailContent.classList.add('hidden');
 
-            const { yourRateValue, offerValue } = getSummaryText();
-            const prompt = `You are a freight dispatcher for Thompson Transportation. Write a brief, professional, and friendly email to a customer presenting a freight quote. Be concise. Here is the data for the quote:
-            - Our Rate: ${yourRateValue}
-            - Quote per Ton: ${offerValue}
-            - Total Miles: ${milesInput.value || 'N/A'}
-            - Final Total All-In: $${finalTotal.value || '0.00'}
+            const { offerValue } = getSummaryText();
+            const prompt = `You are a freight dispatcher for Thompson Transportation. Write a brief, professional, and friendly email to a customer presenting a freight quote. Be concise.
             
-            Please present this clearly to the customer. Sign off as 'Thompson Transportation'.`;
+            The all-inclusive rate we can offer for this lane is ${offerValue}.
+            
+            Please present this quote clearly. Let them know this is an all-in rate and encourage them to reach out with any questions. Sign off as 'Thompson Transportation'.`;
 
             try {
                 let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
