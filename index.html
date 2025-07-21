@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;1,400;1,700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Caveat:wght@700&family=Merriweather:ital,wght@0,400;0,700;1,400;1,700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <script>
         // Apply dark mode immediately from localStorage to prevent flashing
         if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
@@ -20,12 +20,17 @@
         body { 
             font-family: 'Roboto', sans-serif; 
             background-color: #cce7ff;
+            /* Subtle background pattern for light mode */
+            background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%239C92AC' fill-opacity='0.1'%3E%3Cpath d='M0 38.59l2.83-2.83 1.41 1.41L1.41 40H0v-1.41zM0 1.4l2.83 2.83 1.41-1.41L1.41 0H0v1.41zM38.59 40l-2.83-2.83 1.41-1.41L40 38.59V40h-1.41zM40 1.41l-2.83 2.83-1.41-1.41L38.59 0H40v1.41zM20 18.59l2.83-2.83 1.41 1.41L21.41 20l2.83 2.83-1.41 1.41L20 21.41l-2.83 2.83-1.41-1.41L18.59 20l-2.83-2.83 1.41-1.41L20 18.59z'/%3E%3C/g%3E%3C/svg%3E");
+            background-attachment: fixed;
             transition: background-color 0.3s ease;
         }
         .dark body {
             background-color: #0d1a26;
+            /* Subtle background pattern for dark mode */
+            background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M0 38.59l2.83-2.83 1.41 1.41L1.41 40H0v-1.41zM0 1.4l2.83 2.83 1.41-1.41L1.41 0H0v1.41zM38.59 40l-2.83-2.83 1.41-1.41L40 38.59V40h-1.41zM40 1.41l-2.83 2.83-1.41-1.41L38.59 0H40v1.41zM20 18.59l2.83-2.83 1.41 1.41L21.41 20l2.83 2.83-1.41 1.41L20 21.41l-2.83 2.83-1.41-1.41L18.59 20l-2.83-2.83 1.41-1.41L20 18.59z'/%3E%3C/g%3E%3C/svg%3E");
         }
-        .calculator-title { font-family: 'Merriweather', serif; font-style: italic; }
+        .calculator-title { font-family: 'Caveat', cursive; }
         .input-label { font-family: 'Merriweather', serif; font-size: 1.5rem; color: #003366; }
         .dark .input-label { color: #aaccff; }
         .output-label { font-family: 'Merriweather', serif; font-size: 1.5rem; font-weight: bold; color: #003366; }
@@ -38,14 +43,39 @@
         .output-field { background-color: #e0e7ff; font-weight: bold; border-color: #d1d5db; }
         .dark .output-field { background-color: #1e3a5f; color: #e0e7ff; border-color: #4b5563; }
         
-        .mode-btn { transition: all 0.2s ease-in-out; background-color: #dbeafe; color: #1e40af; }
-        .dark .mode-btn { background-color: #1e3a5f; color: #aaccff; }
-        .active-mode { background-color: #3b82f6; color: white; font-weight: bold; transform: scale(1.05); }
-        .dark .active-mode { background-color: #60a5fa; color: #0d1a26; }
-
         /* Menu Styles */
         #side-menu { transition: transform 0.3s ease-in-out; }
         
+        /* Button Styles */
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.2s ease-in-out;
+        }
+        .action-btn:hover { transform: translateY(-2px); box-shadow: 0 7px 14px rgba(0,0,0,0.1); }
+        .action-btn:active { transform: translateY(0); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .btn-email { background-image: linear-gradient(to right, #8b5cf6, #a855f7); }
+        .btn-print { background-image: linear-gradient(to right, #16a34a, #22c55e); }
+        .btn-copy { background-image: linear-gradient(to right, #2563eb, #3b82f6); }
+        .btn-reset { background-image: linear-gradient(to right, #dc2626, #ef4444); }
+
+        /* Animated Mode Selector */
+        #mode-selector-container { background-color: #dbeafe; }
+        .dark #mode-selector-container { background-color: #1f2937; }
+        .mode-btn { color: #1e40af; transition: color 0.3s ease-in-out; z-index: 10; }
+        .dark .mode-btn { color: #aaccff; }
+        .mode-btn.active { color: white; }
+        .dark .mode-btn.active { color: #0d1a26; }
+        #mode-slider { background-color: #3b82f6; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 5; }
+        .dark #mode-slider { background-color: #60a5fa; }
+
         /* --- FINAL PRINT STYLES --- */
         @media print {
             body, html { background-color: white !important; }
@@ -118,7 +148,7 @@
         </div>
     </div>
 
-    <div id="calculator-ui" class="w-full max-w-lg mx-auto bg-white/40 dark:bg-black/20 backdrop-blur-sm p-8 rounded-2xl shadow-2xl transition-colors duration-300">
+    <div id="calculator-ui" class="w-full max-w-lg mx-auto bg-white/30 dark:bg-black/20 backdrop-blur-lg border border-white/50 dark:border-white/10 p-8 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.2)] dark:shadow-[0_10px_30px_rgba(0,0,0,0.5)] transition-all duration-300">
         
         <!-- Header Section -->
         <div class="flex justify-between items-center mb-4">
@@ -128,8 +158,8 @@
                 </button>
             </div>
             <div class="text-center">
-                <h2 class="text-3xl font-bold text-[#4169E1] dark:text-blue-400" style="font-family: 'Merriweather', serif;">Thompson Transportation</h2>
-                <h1 class="calculator-title text-4xl font-bold text-[#003366] dark:text-blue-200 mt-2">Freight Calculator</h1>
+                <h2 class="text-3xl font-bold text-red-600 dark:text-blue-400 transition-colors duration-300" style="font-family: 'Bungee', sans-serif;">Thompson Transportation</h2>
+                <h1 class="calculator-title text-5xl font-bold text-[#003366] dark:text-blue-200 mt-1">Freight Calculator</h1>
             </div>
             <div class="w-8">
                 <button id="theme-toggle" type="button" class="p-1 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
@@ -140,10 +170,11 @@
         </div>
 
         <!-- Mode Selector -->
-        <div class="grid grid-cols-3 gap-2 mb-6 p-2 bg-blue-200 dark:bg-gray-800 rounded-lg">
-            <button type="button" id="mode-quote" class="mode-btn py-2 px-1 rounded-md text-sm sm:text-base">Generate Quote</button>
-            <button type="button" id="mode-ton" class="mode-btn py-2 px-1 rounded-md text-sm sm:text-base">Calc from Ton</button>
-            <button type="button" id="mode-flat" class="mode-btn py-2 px-1 rounded-md text-sm sm:text-base">Calc from Flat</button>
+        <div id="mode-selector-container" class="relative grid grid-cols-3 gap-2 mb-6 p-1 rounded-lg">
+            <div id="mode-slider" class="absolute top-1 bottom-1 left-1 w-1/3 rounded-md"></div>
+            <button type="button" data-mode="generateQuote" class="mode-btn py-2 px-1 rounded-md text-sm sm:text-base">Generate Quote</button>
+            <button type="button" data-mode="calculateFromTon" class="mode-btn py-2 px-1 rounded-md text-sm sm:text-base">Calc from Ton</button>
+            <button type="button" data-mode="calculateFromFlat" class="mode-btn py-2 px-1 rounded-md text-sm sm:text-base">Calc from Flat</button>
         </div>
 
         <!-- Calculator Form -->
@@ -151,36 +182,48 @@
             
             <div id="primaryInputSection">
                 <div class="flex items-center justify-between space-x-4">
-                    <label for="primaryInput" id="primaryInputLabel" class="input-label">Your Rate ($/Mile)</label>
-                    <div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-lg text-gray-500">$</span><input type="number" id="primaryInput" step="0.01" placeholder="e.g., 3.50" class="form-input editable-field w-48 p-3 pl-7 text-lg text-right font-semibold border-2 rounded-lg shadow-inner"></div>
+                    <label for="primaryInput" id="primaryInputLabel" class="input-label transition-opacity duration-300">Your Rate ($/Mile)</label>
+                    <div class="relative w-48"><span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400 dark:text-gray-500"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01"></path></svg></span><input type="number" id="primaryInput" step="0.01" placeholder="e.g., 3.50" class="form-input editable-field w-full p-3 pl-10 text-lg text-right font-semibold border-2 rounded-lg shadow-inner"></div>
                 </div>
             </div>
             <div class="flex items-center justify-between space-x-4">
                 <label for="miles" class="input-label">Total Miles</label>
-                <input type="number" id="miles" step="0.1" placeholder="e.g., 500" class="form-input editable-field w-48 p-3 text-lg text-right font-semibold border-2 rounded-lg shadow-inner">
+                <div class="relative w-48"><span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400 dark:text-gray-500"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 3v18m8-18v18m-4-6h.01M10 9h.01M14 6h.01M14 15h.01"></path></svg></span><input type="number" id="miles" step="0.1" placeholder="e.g., 500" class="form-input editable-field w-full p-3 pl-10 text-lg text-right font-semibold border-2 rounded-lg shadow-inner"></div>
             </div>
             <div class="flex items-center justify-between space-x-4">
                 <label for="fsc" class="input-label">FSC (%)</label>
-                <div class="relative"><input type="number" id="fsc" placeholder="e.g., 10" class="form-input editable-field w-48 p-3 pr-8 text-lg text-right font-semibold border-2 rounded-lg shadow-inner"><span class="absolute right-3 top-1/2 -translate-y-1/2 text-lg text-gray-500">%</span></div>
+                <div class="relative w-48"><span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400 dark:text-gray-500"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path></svg></span><input type="number" id="fsc" placeholder="e.g., 10" class="form-input editable-field w-full p-3 pl-10 text-lg text-right font-semibold border-2 rounded-lg shadow-inner"></div>
             </div>
             <hr class="border-t-2 border-gray-300 dark:border-gray-600 my-5">
             <div class="flex items-center justify-between space-x-4">
-                <label for="primaryOutput" id="primaryOutputLabel" class="output-label">Quote ($/Ton)</label>
-                <div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-lg text-gray-500">$</span><input type="text" id="primaryOutput" readonly class="form-input output-field w-48 p-3 pl-7 text-lg text-right border-2 rounded-lg shadow-inner cursor-not-allowed"></div>
+                <label for="primaryOutput" id="primaryOutputLabel" class="output-label transition-opacity duration-300">Quote ($/Ton)</label>
+                <div class="relative w-48"><span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400 dark:text-gray-500"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01"></path></svg></span><input type="text" id="primaryOutput" readonly class="form-input output-field w-full p-3 pl-10 text-lg text-right border-2 rounded-lg shadow-inner cursor-not-allowed"></div>
             </div>
             <div class="flex items-center justify-between space-x-4">
                 <label for="fscTotal" class="output-label">FSC Total</label>
-                <div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-lg text-gray-500">$</span><input type="text" id="fscTotal" readonly class="form-input output-field w-48 p-3 pl-7 text-lg text-right border-2 rounded-lg shadow-inner cursor-not-allowed"></div>
+                <div class="relative w-48"><span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400 dark:text-gray-500"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01"></path></svg></span><input type="text" id="fscTotal" readonly class="form-input output-field w-full p-3 pl-10 text-lg text-right border-2 rounded-lg shadow-inner cursor-not-allowed"></div>
             </div>
             <div class="flex items-center justify-between space-x-4">
                 <label for="finalTotal" class="output-label">Final Total</label>
-                <div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-lg text-gray-500">$</span><input type="text" id="finalTotal" readonly class="form-input output-field w-48 p-3 pl-7 text-lg text-right border-2 rounded-lg shadow-inner cursor-not-allowed"></div>
+                <div class="relative w-48"><span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400 dark:text-gray-500"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01"></path></svg></span><input type="text" id="finalTotal" readonly class="form-input output-field w-full p-3 pl-10 text-lg text-right border-2 rounded-lg shadow-inner cursor-not-allowed"></div>
             </div>
             <div class="flex items-center justify-center space-x-2 pt-5">
-                <button type="button" id="emailButton" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-transform transform hover:scale-105">Email</button>
-                <button type="button" id="printButton" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-transform transform hover:scale-105 hidden">Print</button>
-                <button type="button" id="copyButton" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-transform transform hover:scale-105">Copy</button>
-                <button type="button" id="resetButton" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-transform transform hover:scale-105">Reset</button>
+                <button type="button" id="emailButton" class="action-btn btn-email">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                    Email
+                </button>
+                <button type="button" id="printButton" class="action-btn btn-print hidden">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                    Print
+                </button>
+                <button type="button" id="copyButton" class="action-btn btn-copy">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                    Copy
+                </button>
+                <button type="button" id="resetButton" class="action-btn btn-reset">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    Reset
+                </button>
             </div>
             <div id="copyNotification" class="text-center text-green-700 dark:text-green-400 font-semibold mt-2 h-6 opacity-0 transition-opacity duration-300"></div>
         </form>
@@ -243,11 +286,10 @@
         const feedbackForm = document.getElementById('feedback-form');
         const personalCalcCounter = document.getElementById('personal-calc-counter');
 
-        const modeButtons = {
-            quote: document.getElementById('mode-quote'),
-            ton: document.getElementById('mode-ton'),
-            flat: document.getElementById('mode-flat')
-        };
+        // Mode Selector Elements
+        const modeSelectorContainer = document.getElementById('mode-selector-container');
+        const modeSlider = document.getElementById('mode-slider');
+        const modeButtons = Array.from(modeSelectorContainer.querySelectorAll('.mode-btn'));
 
         const NET_TONNAGE = 23;
         let currentMode = 'generateQuote';
@@ -309,7 +351,6 @@
                 calculationHistory = calculationHistory.slice(0, 5);
                 localStorage.setItem('thompsonCalcHistory', JSON.stringify(calculationHistory));
                 
-                // Increment and save personal counter
                 personalCalcCount++;
                 localStorage.setItem('thompsonPersonalCalcCount', personalCalcCount);
                 updatePersonalCounterDisplay();
@@ -327,7 +368,7 @@
                 const modeKey = calc.mode.replace('generate', '').replace('calculateFrom', '').toLowerCase();
                 const button = document.createElement('button');
                 button.className = 'w-full text-left p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700';
-                button.innerHTML = `<div class="font-bold text-gray-800 dark:text-gray-200">${modeButtons[modeKey].textContent}</div><div class="text-sm text-gray-600 dark:text-gray-400">Rate: ${yourRateValue} | Offer: ${offerValue}</div>`;
+                button.innerHTML = `<div class="font-bold text-gray-800 dark:text-gray-200">${modeButtons.find(b => b.dataset.mode.toLowerCase().includes(modeKey)).textContent}</div><div class="text-sm text-gray-600 dark:text-gray-400">Rate: ${yourRateValue} | Offer: ${offerValue}</div>`;
                 button.onclick = () => { loadFromHistory(index); closeMenu(); };
                 historyList.appendChild(button);
             });
@@ -364,34 +405,48 @@
         // --- Main App Logic ---
         function setMode(newMode) {
             currentMode = newMode;
-            Object.values(modeButtons).forEach(btn => btn.classList.remove('active-mode'));
+            
+            const activeButton = modeButtons.find(btn => btn.dataset.mode === newMode);
+            
+            modeButtons.forEach(btn => btn.classList.remove('active'));
+            activeButton.classList.add('active');
+
+            // Animate slider
+            const { offsetLeft, offsetWidth } = activeButton;
+            modeSlider.style.width = `${offsetWidth}px`;
+            modeSlider.style.transform = `translateX(${offsetLeft - 4}px)`;
+
             emailButton.classList.toggle('hidden', newMode !== 'generateQuote');
             printButton.classList.toggle('hidden', newMode === 'generateQuote');
 
-            if (newMode === 'generateQuote') modeButtons.quote.classList.add('active-mode');
-            if (newMode === 'calculateFromTon') modeButtons.ton.classList.add('active-mode');
-            if (newMode === 'calculateFromFlat') modeButtons.flat.classList.add('active-mode');
-
             form.reset();
             calculate();
+            
+            // Animate label changes
+            primaryInputLabel.classList.add('opacity-0');
+            primaryOutputLabel.classList.add('opacity-0');
 
-            switch (newMode) {
-                case 'generateQuote':
-                    primaryInputLabel.textContent = 'Your Rate ($/Mile)';
-                    primaryOutputLabel.textContent = 'Quote ($/Ton)';
-                    primaryInput.placeholder = 'e.g., 3.50';
-                    break;
-                case 'calculateFromTon':
-                    primaryInputLabel.textContent = 'Offer ($/Ton)';
-                    primaryOutputLabel.textContent = 'Your Rate ($/Mile)';
-                    primaryInput.placeholder = 'e.g., 150.00';
-                    break;
-                case 'calculateFromFlat':
-                    primaryInputLabel.textContent = 'Flat Rate Offer ($)';
-                    primaryOutputLabel.textContent = 'Your Rate ($/Mile)';
-                    primaryInput.placeholder = 'e.g., 3000.00';
-                    break;
-            }
+            setTimeout(() => {
+                switch (newMode) {
+                    case 'generateQuote':
+                        primaryInputLabel.textContent = 'Your Rate ($/Mile)';
+                        primaryOutputLabel.textContent = 'Quote ($/Ton)';
+                        primaryInput.placeholder = 'e.g., 3.50';
+                        break;
+                    case 'calculateFromTon':
+                        primaryInputLabel.textContent = 'Offer ($/Ton)';
+                        primaryOutputLabel.textContent = 'Your Rate ($/Mile)';
+                        primaryInput.placeholder = 'e.g., 150.00';
+                        break;
+                    case 'calculateFromFlat':
+                        primaryInputLabel.textContent = 'Flat Rate Offer ($)';
+                        primaryOutputLabel.textContent = 'Your Rate ($/Mile)';
+                        primaryInput.placeholder = 'e.g., 3000.00';
+                        break;
+                }
+                primaryInputLabel.classList.remove('opacity-0');
+                primaryOutputLabel.classList.remove('opacity-0');
+            }, 150);
         }
 
         function calculate() {
@@ -411,9 +466,25 @@
                 case 'calculateFromTon':
                 case 'calculateFromFlat': pOutput = miles > 0 ? total / miles : 0; break;
             }
-            primaryOutput.value = pOutput > 0 ? pOutput.toFixed(2) : '';
-            fscTotal.value = fscAmount > 0 ? fscAmount.toFixed(2) : '';
-            finalTotal.value = total > 0 ? total.toFixed(2) : '';
+            
+            // Animate the output fields
+            animateValue(primaryOutput, parseFloat(primaryOutput.value) || 0, pOutput, 300);
+            animateValue(fscTotal, parseFloat(fscTotal.value) || 0, fscAmount, 300);
+            animateValue(finalTotal, parseFloat(finalTotal.value) || 0, total, 300);
+        }
+        
+        function animateValue(element, start, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const currentValue = progress * (end - start) + start;
+                element.value = currentValue > 0.005 ? currentValue.toFixed(2) : '';
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
         }
 
         function getSummaryText(calcData = null) {
@@ -454,17 +525,23 @@
 
         // --- Event Listeners ---
         [primaryInput, milesInput, fscInput].forEach(input => input.addEventListener('input', calculate));
-        modeButtons.quote.addEventListener('click', () => setMode('generateQuote'));
-        modeButtons.ton.addEventListener('click', () => setMode('calculateFromTon'));
-        modeButtons.flat.addEventListener('click', () => setMode('calculateFromFlat'));
-        resetButton.addEventListener('click', () => { form.reset(); calculate(); });
+        
+        modeButtons.forEach(button => {
+            button.addEventListener('click', () => setMode(button.dataset.mode));
+        });
+
+        resetButton.addEventListener('click', () => { 
+            form.reset(); 
+            calculate();
+        });
+
         let saveTimeout;
         form.addEventListener('input', () => { clearTimeout(saveTimeout); saveTimeout = setTimeout(saveCalculation, 1500); });
 
         copyButton.addEventListener('click', () => {
             const { yourRateLabel, yourRateValue, offerLabel, offerValue } = getSummaryText();
-            const modeKey = currentMode.replace('generate', '').replace('calculateFrom', '').toLowerCase();
-            const summary = `Freight Calculation Summary:\n- Mode: ${modeButtons[modeKey].textContent}\n- Miles: ${milesInput.value || 'N/A'}\n- FSC: ${fscInput.value || 0}%\n---\n- Final Total: $${finalTotal.value || '0.00'}\n- FSC Amount: $${fscTotal.value || '0.00'}\n---\n- ${yourRateLabel} ${yourRateValue}\n- ${offerLabel} ${offerValue}`.trim();
+            const activeBtn = modeButtons.find(b => b.dataset.mode === currentMode);
+            const summary = `Freight Calculation Summary:\n- Mode: ${activeBtn.textContent}\n- Miles: ${milesInput.value || 'N/A'}\n- FSC: ${fscInput.value || 0}%\n---\n- Final Total: $${finalTotal.value || '0.00'}\n- FSC Amount: $${fscTotal.value || '0.00'}\n---\n- ${yourRateLabel} ${yourRateValue}\n- ${offerLabel} ${offerValue}`.trim();
             copySource.value = summary;
             copySource.select();
             document.execCommand('copy');
@@ -475,9 +552,9 @@
 
         printButton.addEventListener('click', () => {
             const { yourRateLabel, yourRateValue, offerLabel, offerValue } = getSummaryText();
-            const modeKey = currentMode.replace('generate', '').replace('calculateFrom', '').toLowerCase();
+            const activeBtn = modeButtons.find(b => b.dataset.mode === currentMode);
             document.getElementById('print-date').textContent = new Date().toLocaleDateString();
-            document.getElementById('print-mode').textContent = modeButtons[modeKey].textContent;
+            document.getElementById('print-mode').textContent = activeBtn.textContent;
             document.getElementById('print-miles').textContent = milesInput.value || 'N/A';
             document.getElementById('print-fsc').textContent = `${fscInput.value || 0}%`;
             document.querySelector('#print-your-rate-row strong').textContent = yourRateLabel;
