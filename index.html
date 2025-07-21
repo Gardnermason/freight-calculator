@@ -582,20 +582,29 @@
             try {
                 let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
                 const payload = { contents: chatHistory };
-                const apiKey = ""; 
+                const apiKey = ""; // This will be handled by the environment
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                
                 const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
+                
+                if (!response.ok) {
+                    // Handle non-200 responses
+                    const errorBody = await response.json();
+                    console.error("API Error:", errorBody);
+                    throw new Error(`API request failed with status ${response.status}`);
+                }
+
                 const result = await response.json();
                 
-                if (result.candidates && result.candidates.length > 0) {
+                if (result.candidates && result.candidates.length > 0 && result.candidates[0].content.parts.length > 0) {
                     const text = result.candidates[0].content.parts[0].text;
                     emailDraft.value = text;
                 } else {
-                    emailDraft.value = "Sorry, there was an error generating the email draft. Please try again.";
+                    emailDraft.value = "Sorry, there was an error generating the email draft. The response was empty. Please try again.";
                 }
             } catch (error) {
                 console.error("Error calling Gemini API:", error);
