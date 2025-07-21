@@ -32,57 +32,92 @@
         .dark .output-label { color: #aaccff; }
         .form-input:focus { outline: none; box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.5); border-color: #007BFF !important; }
         
-        /* New robust styles for input fields */
-        .editable-field {
-            background-color: white;
-            color: #111827; /* gray-900 */
-            border-color: #d1d5db; /* gray-300 */
-        }
-        .dark .editable-field {
-            background-color: #374151; /* gray-700 */
-            color: white;
-            border-color: #4b5563; /* gray-600 */
-        }
+        .editable-field { background-color: white; color: #111827; border-color: #d1d5db; }
+        .dark .editable-field { background-color: #374151; color: white; border-color: #4b5563; }
 
         .output-field { background-color: #e0e7ff; font-weight: bold; border-color: #d1d5db; }
         .dark .output-field { background-color: #1e3a5f; color: #e0e7ff; border-color: #4b5563; }
-        .mode-btn {
-            transition: all 0.2s ease-in-out;
-            background-color: #dbeafe;
-            color: #1e40af;
-        }
-        .dark .mode-btn {
-            background-color: #1e3a5f;
-            color: #aaccff;
-        }
-        .active-mode {
-            background-color: #3b82f6;
-            color: white;
-            font-weight: bold;
-            transform: scale(1.05);
-        }
-        .dark .active-mode {
-            background-color: #60a5fa;
-            color: #0d1a26;
-        }
+        
+        .mode-btn { transition: all 0.2s ease-in-out; background-color: #dbeafe; color: #1e40af; }
+        .dark .mode-btn { background-color: #1e3a5f; color: #aaccff; }
+        .active-mode { background-color: #3b82f6; color: white; font-weight: bold; transform: scale(1.05); }
+        .dark .active-mode { background-color: #60a5fa; color: #0d1a26; }
+
+        /* Menu Styles */
+        #side-menu { transition: transform 0.3s ease-in-out; }
         
         /* --- FINAL PRINT STYLES --- */
         @media print {
             body, html { background-color: white !important; }
-            #calculator-ui { display: none !important; }
+            #calculator-ui, #side-menu, #menu-overlay { display: none !important; }
             .print-area { display: block !important; position: absolute; top: 0; left: 0; width: 100%; }
             .print-area-content { background-color: white !important; color: black !important; -webkit-print-color-adjust: exact; color-adjust: exact; }
             .print-area-content * { color: black !important; }
         }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen p-4">
+<body class="flex items-center justify-center min-h-screen p-4 overflow-x-hidden">
+
+    <!-- Menu Overlay -->
+    <div id="menu-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden"></div>
+
+    <!-- Side Menu -->
+    <div id="side-menu" class="fixed top-0 left-0 h-full w-80 bg-white dark:bg-gray-800 shadow-xl z-40 transform -translate-x-full">
+        <div class="p-5">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-[#003366] dark:text-blue-200">Menu</h2>
+                <button id="close-menu-btn" class="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                    <svg class="w-6 h-6 text-gray-700 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <nav id="main-menu">
+                <a href="#" id="history-menu-btn" class="flex items-center p-3 text-lg text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Recent Calculations
+                </a>
+                <a href="#" id="feedback-menu-btn" class="flex items-center p-3 text-lg text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                     <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+                    Send Feedback
+                </a>
+            </nav>
+            <!-- History View -->
+            <div id="history-view" class="hidden">
+                 <div class="flex justify-between items-center mb-4">
+                    <button id="back-to-menu-hist" class="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                        <svg class="w-6 h-6 text-gray-700 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                    </button>
+                    <h3 class="text-xl font-bold text-center text-[#003366] dark:text-blue-200">History</h3>
+                    <div class="w-6"></div>
+                </div>
+                <div id="history-list" class="space-y-2 max-h-96 overflow-y-auto"></div>
+                <button id="clear-history-btn" class="w-full mt-4 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Clear History</button>
+            </div>
+            <!-- Feedback View -->
+            <div id="feedback-view" class="hidden">
+                <div class="flex justify-between items-center mb-4">
+                    <button id="back-to-menu-feed" class="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                        <svg class="w-6 h-6 text-gray-700 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                    </button>
+                    <h3 class="text-xl font-bold text-center text-[#003366] dark:text-blue-200">Feedback</h3>
+                    <div class="w-6"></div>
+                </div>
+                <form id="feedback-form" class="space-y-4">
+                    <textarea id="feedback-message" placeholder="Your feedback..." rows="5" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700"></textarea>
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Send</button>
+                </form>
+            </div>
+        </div>
+    </div>
 
     <div id="calculator-ui" class="w-full max-w-lg mx-auto bg-white/40 dark:bg-black/20 backdrop-blur-sm p-8 rounded-2xl shadow-2xl transition-colors duration-300">
         
         <!-- Header Section -->
         <div class="flex justify-between items-center mb-4">
-            <div class="w-8"></div>
+            <div class="w-8">
+                <button id="open-menu-btn" type="button" class="p-1 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                </button>
+            </div>
             <div class="text-center">
                 <h2 class="text-3xl font-bold text-[#4169E1] dark:text-blue-400" style="font-family: 'Merriweather', serif;">Thompson Transportation</h2>
                 <h1 class="calculator-title text-4xl font-bold text-[#003366] dark:text-blue-200 mt-2">Freight Calculator</h1>
@@ -168,7 +203,6 @@
         const milesInput = document.getElementById('miles');
         const fscInput = document.getElementById('fsc');
         const primaryOutput = document.getElementById('primaryOutput');
-        const primaryOutputLabel = document.getElementById('primaryOutputLabel');
         const fscTotal = document.getElementById('fscTotal');
         const finalTotal = document.getElementById('finalTotal');
         const copyButton = document.getElementById('copyButton');
@@ -180,6 +214,22 @@
         const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
         const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
         
+        // Menu Elements
+        const openMenuBtn = document.getElementById('open-menu-btn');
+        const closeMenuBtn = document.getElementById('close-menu-btn');
+        const sideMenu = document.getElementById('side-menu');
+        const menuOverlay = document.getElementById('menu-overlay');
+        const mainMenu = document.getElementById('main-menu');
+        const historyView = document.getElementById('history-view');
+        const feedbackView = document.getElementById('feedback-view');
+        const historyMenuBtn = document.getElementById('history-menu-btn');
+        const feedbackMenuBtn = document.getElementById('feedback-menu-btn');
+        const backToMenuHist = document.getElementById('back-to-menu-hist');
+        const backToMenuFeed = document.getElementById('back-to-menu-feed');
+        const historyList = document.getElementById('history-list');
+        const clearHistoryBtn = document.getElementById('clear-history-btn');
+        const feedbackForm = document.getElementById('feedback-form');
+
         const modeButtons = {
             quote: document.getElementById('mode-quote'),
             ton: document.getElementById('mode-ton'),
@@ -188,6 +238,7 @@
 
         const NET_TONNAGE = 23;
         let currentMode = 'generateQuote';
+        let calculationHistory = JSON.parse(localStorage.getItem('thompsonCalcHistory')) || [];
 
         // --- Dark Mode Logic ---
         function updateThemeIcon(isDarkMode) {
@@ -200,6 +251,126 @@
             const isDarkMode = document.documentElement.classList.contains('dark');
             localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
             updateThemeIcon(isDarkMode);
+        });
+
+        // --- Menu Logic ---
+        function openMenu() {
+            sideMenu.classList.remove('-translate-x-full');
+            menuOverlay.classList.remove('hidden');
+        }
+
+        function closeMenu() {
+            sideMenu.classList.add('-translate-x-full');
+            menuOverlay.classList.add('hidden');
+            // Reset to main menu view when closing
+            mainMenu.classList.remove('hidden');
+            historyView.classList.add('hidden');
+            feedbackView.classList.add('hidden');
+        }
+
+        openMenuBtn.addEventListener('click', openMenu);
+        closeMenuBtn.addEventListener('click', closeMenu);
+        menuOverlay.addEventListener('click', closeMenu);
+
+        historyMenuBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            mainMenu.classList.add('hidden');
+            historyView.classList.remove('hidden');
+            renderHistory();
+        });
+
+        feedbackMenuBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            mainMenu.classList.add('hidden');
+            feedbackView.classList.remove('hidden');
+        });
+
+        backToMenuHist.addEventListener('click', () => {
+            historyView.classList.add('hidden');
+            mainMenu.classList.remove('hidden');
+        });
+        
+        backToMenuFeed.addEventListener('click', () => {
+            feedbackView.classList.add('hidden');
+            mainMenu.classList.remove('hidden');
+        });
+
+        // --- History Logic ---
+        function saveCalculation() {
+            if (!parseFloat(primaryInput.value) && !parseFloat(milesInput.value)) return;
+
+            const calculation = {
+                mode: currentMode,
+                primaryInput: primaryInput.value,
+                miles: milesInput.value,
+                fsc: fscInput.value,
+                timestamp: new Date().toISOString()
+            };
+            
+            calculationHistory.unshift(calculation);
+            calculationHistory = calculationHistory.slice(0, 5);
+            localStorage.setItem('thompsonCalcHistory', JSON.stringify(calculationHistory));
+        }
+
+        function renderHistory() {
+            historyList.innerHTML = '';
+            if (calculationHistory.length === 0) {
+                historyList.innerHTML = `<p class="text-center text-gray-500 dark:text-gray-400">No recent calculations.</p>`;
+                return;
+            }
+            calculationHistory.forEach((calc, index) => {
+                const { yourRateValue, offerValue } = getSummaryText(calc);
+                const modeKey = calc.mode.replace('generate', '').replace('calculateFrom', '').toLowerCase();
+                const button = document.createElement('button');
+                button.className = 'w-full text-left p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700';
+                button.innerHTML = `
+                    <div class="font-bold text-gray-800 dark:text-gray-200">${modeButtons[modeKey].textContent}</div>
+                    <div class="text-sm text-gray-600 dark:text-gray-400">Rate: ${yourRateValue} | Offer: ${offerValue}</div>
+                `;
+                button.onclick = () => {
+                    loadFromHistory(index);
+                    closeMenu();
+                };
+                historyList.appendChild(button);
+            });
+        }
+
+        function loadFromHistory(index) {
+            const calc = calculationHistory[index];
+            setMode(calc.mode);
+            primaryInput.value = calc.primaryInput;
+            milesInput.value = calc.miles;
+            fscInput.value = calc.fsc;
+            calculate();
+        }
+
+        clearHistoryBtn.addEventListener('click', () => {
+            calculationHistory = [];
+            localStorage.removeItem('thompsonCalcHistory');
+            renderHistory();
+        });
+
+        // --- Feedback Logic ---
+        feedbackForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const message = document.getElementById('feedback-message').value;
+            if (message.trim()) {
+                const recipient = 'mgardner@thompsontrans.net';
+                const subject = 'Feedback for Freight Calculator';
+                const body = encodeURIComponent(message);
+                
+                const mailtoLink = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${body}`;
+                window.location.href = mailtoLink;
+
+                feedbackForm.innerHTML = `<p class="text-center text-lg text-green-600 dark:text-green-400">Opening your email client...</p>`;
+                setTimeout(() => {
+                    closeMenu();
+                    feedbackForm.innerHTML = `
+                        <textarea id="feedback-message" placeholder="Your feedback..." rows="5" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700"></textarea>
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Send</button>
+                    `;
+                }, 2500);
+            }
         });
 
         // --- Main App Logic ---
@@ -260,22 +431,49 @@
             finalTotal.value = total > 0 ? total.toFixed(2) : '';
         }
 
-        function getSummaryText() {
+        function getSummaryText(calcData = null) {
+            const data = calcData || {
+                mode: currentMode,
+                primaryInput: primaryInput.value,
+                miles: milesInput.value,
+                fsc: fscInput.value
+            };
+            
+            const pInput = parseFloat(data.primaryInput) || 0;
+            const miles = parseFloat(data.miles) || 0;
+            const fscPercent = parseFloat(data.fsc) || 0;
+            
+            let lineHaul = 0;
+            let pOutput = 0;
+            
+            switch (data.mode) {
+                case 'generateQuote': lineHaul = pInput * miles; break;
+                case 'calculateFromTon': lineHaul = pInput * NET_TONNAGE; break;
+                case 'calculateFromFlat': lineHaul = pInput; break;
+            }
+            const total = lineHaul * (1 + fscPercent / 100);
+            
+            switch (data.mode) {
+                case 'generateQuote': pOutput = total > 0 ? total / NET_TONNAGE : 0; break;
+                case 'calculateFromTon':
+                case 'calculateFromFlat': pOutput = miles > 0 ? total / miles : 0; break;
+            }
+
             let yourRateLabel, yourRateValue, offerLabel, offerValue;
 
-            if (currentMode === 'generateQuote') {
+            if (data.mode === 'generateQuote') {
                 yourRateLabel = 'Your Rate:';
-                yourRateValue = `$${primaryInput.value || 'N/A'} / mile`;
+                yourRateValue = `$${pInput.toFixed(2)} / mile`;
                 offerLabel = 'Quote to Customer:';
-                offerValue = `$${primaryOutput.value || 'N/A'} / ton`;
+                offerValue = `$${pOutput.toFixed(2)} / ton`;
             } else {
                 yourRateLabel = 'Your Calculated Rate:';
-                yourRateValue = `$${primaryOutput.value || 'N/A'} / mile`;
+                yourRateValue = `$${pOutput.toFixed(2)} / mile`;
                 offerLabel = 'Customer Offer:';
-                if (currentMode === 'calculateFromTon') {
-                    offerValue = `$${primaryInput.value || 'N/A'} / ton`;
+                if (data.mode === 'calculateFromTon') {
+                    offerValue = `$${pInput.toFixed(2)} / ton`;
                 } else { // calculateFromFlat
-                    offerValue = `$${primaryInput.value || 'N/A'} (Flat)`;
+                    offerValue = `$${pInput.toFixed(2)} (Flat)`;
                 }
             }
             return { yourRateLabel, yourRateValue, offerLabel, offerValue };
@@ -288,11 +486,19 @@
         modeButtons.flat.addEventListener('click', () => setMode('calculateFromFlat'));
         resetButton.addEventListener('click', () => { form.reset(); calculate(); });
 
+        // Add a small delay before saving to avoid saving incomplete calculations
+        let saveTimeout;
+        form.addEventListener('input', () => {
+            clearTimeout(saveTimeout);
+            saveTimeout = setTimeout(saveCalculation, 1500);
+        });
+
         copyButton.addEventListener('click', () => {
             const { yourRateLabel, yourRateValue, offerLabel, offerValue } = getSummaryText();
+            const modeKey = currentMode.replace('generate', '').replace('calculateFrom', '').toLowerCase();
             const summary = `
 Freight Calculation Summary:
-- Mode: ${modeButtons[currentMode.replace('calculateFrom', '').toLowerCase()].textContent}
+- Mode: ${modeButtons[modeKey].textContent}
 - Miles: ${milesInput.value || 'N/A'}
 - FSC: ${fscInput.value || 0}%
 ---
@@ -311,9 +517,9 @@ Freight Calculation Summary:
 
         printButton.addEventListener('click', () => {
             const { yourRateLabel, yourRateValue, offerLabel, offerValue } = getSummaryText();
-            // Populate the print area
+            const modeKey = currentMode.replace('generate', '').replace('calculateFrom', '').toLowerCase();
             document.getElementById('print-date').textContent = new Date().toLocaleDateString();
-            document.getElementById('print-mode').textContent = modeButtons[currentMode.replace('calculateFrom', '').toLowerCase()].textContent;
+            document.getElementById('print-mode').textContent = modeButtons[modeKey].textContent;
             document.getElementById('print-miles').textContent = milesInput.value || 'N/A';
             document.getElementById('print-fsc').textContent = `${fscInput.value || 0}%`;
             
