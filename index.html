@@ -30,6 +30,14 @@
             /* Subtle background pattern for dark mode */
             background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M0 38.59l2.83-2.83 1.41 1.41L1.41 40H0v-1.41zM0 1.4l2.83 2.83 1.41-1.41L1.41 0H0v1.41zM38.59 40l-2.83-2.83 1.41-1.41L40 38.59V40h-1.41zM40 1.41l-2.83 2.83-1.41-1.41L38.59 0H40v1.41zM20 18.59l2.83-2.83 1.41 1.41L21.41 20l2.83 2.83-1.41 1.41L20 21.41l-2.83 2.83-1.41-1.41L18.59 20l-2.83-2.83 1.41-1.41L20 18.59z'/%3E%3C/g%3E%3C/svg%3E");
         }
+        .main-title {
+            font-family: 'Bungee', sans-serif;
+            color: #dc2626; /* Red color for light mode */
+            transition: color 0.3s ease-in-out;
+        }
+        .dark .main-title {
+            color: #60a5fa; /* Blue color for dark mode */
+        }
         .calculator-title { font-family: 'Caveat', cursive; }
         .input-label { font-family: 'Merriweather', serif; font-size: 1.5rem; color: #003366; }
         .dark .input-label { color: #aaccff; }
@@ -123,7 +131,7 @@
             <div class="mt-auto p-4 border-t border-gray-200 dark:border-gray-700">
                 <h3 class="text-lg font-semibold text-center text-[#003366] dark:text-blue-200">Calculation Counter</h3>
                 <p id="personal-calc-counter" class="text-4xl font-bold text-center text-blue-600 dark:text-blue-400 mt-2">0</p>
-                <p class="text-center text-xs text-gray-400 dark:text-gray-500 mt-2">Version 2.1</p>
+                <p class="text-center text-xs text-gray-400 dark:text-gray-500 mt-2">Version 2.2</p>
             </div>
             <!-- History View -->
             <div id="history-view" class="hidden absolute inset-0 bg-white dark:bg-gray-800 p-5">
@@ -164,7 +172,7 @@
                 </button>
             </div>
             <div class="text-center">
-                <h2 class="text-3xl font-bold text-red-600 dark:text-blue-400 transition-colors duration-300" style="font-family: 'Bungee', sans-serif;">Thompson Transportation</h2>
+                <h2 class="main-title text-3xl font-bold">Thompson Transportation</h2>
                 <h1 class="calculator-title text-5xl font-bold text-[#003366] dark:text-blue-200 mt-1">Freight Calculator</h1>
             </div>
             <div class="w-8"></div>
