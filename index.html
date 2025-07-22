@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Caveat:wght@700&family=Merriweather:ital,wght@0,400;0,700;1,400;1,700&family=Roboto:wght@400;500;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
     <script>
         // Apply dark mode immediately from localStorage to prevent flashing
         if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
@@ -137,6 +138,9 @@
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen p-4 overflow-x-hidden">
+
+    <!-- Transition Canvas -->
+    <canvas id="transition-canvas" class="fixed inset-0 w-full h-full z-50 pointer-events-none hidden"></canvas>
 
     <!-- Menu Overlay -->
     <div id="menu-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden"></div>
