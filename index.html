@@ -329,6 +329,7 @@
         const themeToggleBtn = document.getElementById('theme-toggle');
         const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
         const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+        const transitionCanvas = document.getElementById('transition-canvas');
         
         // Menu Elements
         const openMenuBtn = document.getElementById('open-menu-btn');
@@ -356,14 +357,92 @@
         let calculationHistory = JSON.parse(localStorage.getItem('thompsonCalcHistory')) || [];
         let personalCalcCount = parseInt(localStorage.getItem('thompsonPersonalCalcCount')) || 0;
 
-        // --- Konami Code Logic ---
+        // --- Konami Code & Sound Logic ---
         const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
         let konamiIndex = 0;
+
+        async function playRetroMusic() {
+            await Tone.start();
+            const synth = new Tone.PolySynth(Tone.Synth, {
+                oscillator: { type: "square" },
+                envelope: { attack: 0.01, decay: 0.1, sustain: 0.2, release: 0.1 }
+            }).toDestination();
+            
+            const now = Tone.now();
+            synth.triggerAttackRelease("C#3", "8n", now);
+            synth.triggerAttackRelease("G#2", "8n", now + 0.25);
+            synth.triggerAttackRelease("C#3", "8n", now + 0.5);
+            synth.triggerAttackRelease("G#2", "8n", now + 0.75);
+            synth.triggerAttackRelease("C#3", "8n", now + 1);
+            synth.triggerAttackRelease("F2", "8n", now + 1.25);
+            synth.triggerAttackRelease("C#3", "8n", now + 1.5);
+            synth.triggerAttackRelease("F2", "8n", now + 1.75);
+        }
+        
+        async function playPowerDownSound() {
+            await Tone.start();
+            const synth = new Tone.Synth({
+                oscillator: { type: "sawtooth" },
+                envelope: { attack: 0.01, decay: 0.5, sustain: 0, release: 0.1 }
+            }).toDestination();
+            synth.triggerAttackRelease("C4", "4n");
+            synth.frequency.rampTo("C2", 0.5);
+        }
+
+        function runAcidRain() {
+            transitionCanvas.classList.remove('hidden');
+            const ctx = transitionCanvas.getContext('2d');
+            let w = transitionCanvas.width = window.innerWidth;
+            let h = transitionCanvas.height = window.innerHeight;
+            let cols = Math.floor(w / 20) + 1;
+            let ypos = Array(cols).fill(0);
+
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, w, h);
+
+            let animFrame;
+            function matrix() {
+                ctx.fillStyle = '#0001';
+                ctx.fillRect(0, 0, w, h);
+                ctx.fillStyle = '#4ade80';
+                ctx.font = '15pt monospace';
+
+                ypos.forEach((y, ind) => {
+                    const text = String.fromCharCode(Math.random() * 128);
+                    const x = ind * 20;
+                    ctx.fillText(text, x, y);
+                    if (y > 100 + Math.random() * 10000) ypos[ind] = 0;
+                    else ypos[ind] = y + 20;
+                });
+            }
+            animFrame = setInterval(matrix, 50);
+            
+            setTimeout(() => {
+                clearInterval(animFrame);
+                let opacity = 1;
+                const fadeOut = setInterval(() => {
+                    ctx.fillStyle = `rgba(0,0,0,${opacity * 0.1})`;
+                    ctx.fillRect(0, 0, w, h);
+                    opacity -= 0.1;
+                    if (opacity <= 0) {
+                        clearInterval(fadeOut);
+                        transitionCanvas.classList.add('hidden');
+                    }
+                }, 50);
+            }, 2000);
+        }
+
         window.addEventListener('keydown', (e) => {
             if (e.key === konamiCode[konamiIndex]) {
                 konamiIndex++;
                 if (konamiIndex === konamiCode.length) {
-                    document.body.classList.toggle('retro-mode');
+                    const isRetro = document.body.classList.toggle('retro-mode');
+                    if (isRetro) {
+                        runAcidRain();
+                        playRetroMusic();
+                    } else {
+                        playPowerDownSound();
+                    }
                     konamiIndex = 0;
                 }
             } else {
