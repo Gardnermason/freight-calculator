@@ -35,6 +35,7 @@
             font-family: 'Bungee', sans-serif;
             color: #dc2626; /* Red color for light mode */
             transition: color 0.3s ease-in-out;
+            cursor: pointer;
         }
         .dark .main-title {
             color: #60a5fa; /* Blue color for dark mode */
@@ -218,7 +219,7 @@
                 </button>
             </div>
             <div class="text-center">
-                <h2 class="main-title text-3xl font-bold">Thompson Transportation</h2>
+                <h2 id="main-title" class="main-title text-3xl font-bold">Thompson Transportation</h2>
                 <h1 class="calculator-title text-5xl font-bold text-[#003366] dark:text-blue-200 mt-1">Freight Calculator</h1>
             </div>
             <div class="w-8"></div>
@@ -330,6 +331,7 @@
         const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
         const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
         const transitionCanvas = document.getElementById('transition-canvas');
+        const mainTitle = document.getElementById('main-title');
         
         // Menu Elements
         const openMenuBtn = document.getElementById('open-menu-btn');
@@ -448,6 +450,22 @@
             } else {
                 konamiIndex = 0;
             }
+        });
+        
+        // --- Truck Horn Easter Egg ---
+        let hornClickCount = 0;
+        let hornTimeout;
+        mainTitle.addEventListener('click', async () => {
+            clearTimeout(hornTimeout);
+            hornClickCount++;
+            if (hornClickCount === 5) {
+                await Tone.start();
+                const horn = new Tone.Oscillator(185, "sawtooth").toDestination();
+                horn.volume.value = -12;
+                horn.start().stop("+0.8");
+                hornClickCount = 0;
+            }
+            hornTimeout = setTimeout(() => { hornClickCount = 0; }, 2000);
         });
 
         // --- Dark Mode Logic ---
