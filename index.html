@@ -200,6 +200,10 @@
                 <div class="relative w-48"><span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400 dark:text-gray-500"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 3v18m8-18v18m-4-6h.01M10 9h.01M14 6h.01M14 15h.01"></path></svg></span><input type="number" id="miles" step="0.1" placeholder="e.g., 500" class="form-input editable-field w-full p-3 pl-10 text-lg text-right font-semibold border-2 rounded-lg shadow-inner"></div>
             </div>
             <div class="flex items-center justify-between space-x-4">
+                <label for="tonnage" class="input-label">Tonnage</label>
+                <div class="relative w-48"><span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400 dark:text-gray-500"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 20V12a6 6 0 1112 0v8m-12 0h12m-9-14V5a3 3 0 016 0v1"></path></svg></span><input type="number" id="tonnage" step="0.1" value="23" class="form-input editable-field w-full p-3 pl-10 text-lg text-right font-semibold border-2 rounded-lg shadow-inner"></div>
+            </div>
+            <div class="flex items-center justify-between space-x-4">
                 <label for="fsc" class="input-label">FSC (%)</label>
                 <div class="relative w-48"><span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400 dark:text-gray-500"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path></svg></span><input type="number" id="fsc" placeholder="e.g., 10" class="form-input editable-field w-full p-3 pl-10 text-lg text-right font-semibold border-2 rounded-lg shadow-inner"></div>
             </div>
@@ -246,6 +250,7 @@
             <p class="mb-2 text-lg"><strong class="w-48 inline-block">Date:</strong> <span id="print-date"></span></p>
             <p class="mb-2 text-lg"><strong class="w-48 inline-block">Calculation Mode:</strong> <span id="print-mode"></span></p>
             <p class="mb-2 text-lg"><strong class="w-48 inline-block">Total Miles:</strong> <span id="print-miles"></span></p>
+            <p class="mb-2 text-lg"><strong class="w-48 inline-block">Tonnage:</strong> <span id="print-tonnage"></span></p>
             <p class="mb-2 text-lg"><strong class="w-48 inline-block">FSC (%):</strong> <span id="print-fsc"></span></p>
             <hr class="my-4">
             <p class="mb-2 text-lg" id="print-your-rate-row"><strong class="w-48 inline-block"></strong> <span id="print-your-rate"></span></p>
@@ -264,6 +269,7 @@
         const primaryInput = document.getElementById('primaryInput');
         const primaryInputLabel = document.getElementById('primaryInputLabel');
         const milesInput = document.getElementById('miles');
+        const tonnageInput = document.getElementById('tonnage');
         const fscInput = document.getElementById('fsc');
         const primaryOutput = document.getElementById('primaryOutput');
         const fscTotal = document.getElementById('fscTotal');
@@ -300,7 +306,6 @@
         const modeSlider = document.getElementById('mode-slider');
         const modeButtons = Array.from(modeSelectorContainer.querySelectorAll('.mode-btn'));
 
-        const NET_TONNAGE = 23;
         let currentMode = 'generateQuote';
         let calculationHistory = JSON.parse(localStorage.getItem('thompsonCalcHistory')) || [];
         let personalCalcCount = parseInt(localStorage.getItem('thompsonPersonalCalcCount')) || 0;
@@ -351,10 +356,10 @@
             const pInput = parseFloat(primaryInput.value) || 0;
             const miles = parseFloat(milesInput.value) || 0;
             if (pInput > 0 && miles > 0) {
-                const calculation = { mode: currentMode, primaryInput: primaryInput.value, miles: milesInput.value, fsc: fscInput.value, timestamp: new Date().toISOString() };
+                const calculation = { mode: currentMode, primaryInput: primaryInput.value, miles: milesInput.value, tonnage: tonnageInput.value, fsc: fscInput.value, timestamp: new Date().toISOString() };
                 if (calculationHistory.length > 0) {
                     const lastCalc = calculationHistory[0];
-                    if (lastCalc.mode === calculation.mode && lastCalc.primaryInput === calculation.primaryInput && lastCalc.miles === calculation.miles && lastCalc.fsc === calculation.fsc) return;
+                    if (lastCalc.mode === calculation.mode && lastCalc.primaryInput === calculation.primaryInput && lastCalc.miles === calculation.miles && lastCalc.tonnage === calculation.tonnage && lastCalc.fsc === calculation.fsc) return;
                 }
                 calculationHistory.unshift(calculation);
                 calculationHistory = calculationHistory.slice(0, 5);
@@ -388,6 +393,7 @@
             setMode(calc.mode);
             primaryInput.value = calc.primaryInput;
             milesInput.value = calc.miles;
+            tonnageInput.value = calc.tonnage || 23;
             fscInput.value = calc.fsc;
             calculate();
         }
@@ -428,7 +434,15 @@
             emailButton.classList.toggle('hidden', newMode !== 'generateQuote');
             printButton.classList.toggle('hidden', newMode === 'generateQuote');
 
+            // Disable tonnage input in flat rate mode
+            const isFlatMode = newMode === 'calculateFromFlat';
+            tonnageInput.disabled = isFlatMode;
+            tonnageInput.classList.toggle('opacity-50', isFlatMode);
+            tonnageInput.classList.toggle('cursor-not-allowed', isFlatMode);
+
+
             form.reset();
+            tonnageInput.value = isFlatMode ? '' : 23;
             calculate();
             
             // Animate label changes
@@ -461,17 +475,18 @@
         function calculate() {
             const pInput = parseFloat(primaryInput.value) || 0;
             const miles = parseFloat(milesInput.value) || 0;
+            const tonnage = parseFloat(tonnageInput.value) || 23;
             const fscPercent = parseFloat(fscInput.value) || 0;
             let lineHaul = 0, pOutput = 0;
             switch (currentMode) {
                 case 'generateQuote': lineHaul = pInput * miles; break;
-                case 'calculateFromTon': lineHaul = pInput * NET_TONNAGE; break;
+                case 'calculateFromTon': lineHaul = pInput * tonnage; break;
                 case 'calculateFromFlat': lineHaul = pInput; break;
             }
             const fscAmount = lineHaul * (fscPercent / 100);
             const total = lineHaul + fscAmount;
             switch (currentMode) {
-                case 'generateQuote': pOutput = total > 0 ? total / NET_TONNAGE : 0; break;
+                case 'generateQuote': pOutput = total > 0 ? total / tonnage : 0; break;
                 case 'calculateFromTon':
                 case 'calculateFromFlat': pOutput = miles > 0 ? total / miles : 0; break;
             }
@@ -497,19 +512,20 @@
         }
 
         function getSummaryText(calcData = null) {
-            const data = calcData || { mode: currentMode, primaryInput: primaryInput.value, miles: milesInput.value, fsc: fscInput.value };
+            const data = calcData || { mode: currentMode, primaryInput: primaryInput.value, miles: milesInput.value, tonnage: tonnageInput.value, fsc: fscInput.value };
             const pInput = parseFloat(data.primaryInput) || 0;
             const miles = parseFloat(data.miles) || 0;
+            const tonnage = parseFloat(data.tonnage) || 23;
             const fscPercent = parseFloat(data.fsc) || 0;
             let lineHaul = 0, pOutput = 0;
             switch (data.mode) {
                 case 'generateQuote': lineHaul = pInput * miles; break;
-                case 'calculateFromTon': lineHaul = pInput * NET_TONNAGE; break;
+                case 'calculateFromTon': lineHaul = pInput * tonnage; break;
                 case 'calculateFromFlat': lineHaul = pInput; break;
             }
             const total = lineHaul * (1 + fscPercent / 100);
             switch (data.mode) {
-                case 'generateQuote': pOutput = total > 0 ? total / NET_TONNAGE : 0; break;
+                case 'generateQuote': pOutput = total > 0 ? total / tonnage : 0; break;
                 case 'calculateFromTon':
                 case 'calculateFromFlat': pOutput = miles > 0 ? total / miles : 0; break;
             }
@@ -533,7 +549,7 @@
         }
 
         // --- Event Listeners ---
-        [primaryInput, milesInput, fscInput].forEach(input => input.addEventListener('input', calculate));
+        [primaryInput, milesInput, tonnageInput, fscInput].forEach(input => input.addEventListener('input', calculate));
         
         modeButtons.forEach(button => {
             button.addEventListener('click', () => setMode(button.dataset.mode));
@@ -541,6 +557,7 @@
 
         resetButton.addEventListener('click', () => { 
             form.reset(); 
+            tonnageInput.value = 23;
             calculate();
         });
 
@@ -550,7 +567,7 @@
         copyButton.addEventListener('click', () => {
             const { yourRateLabel, yourRateValue, offerLabel, offerValue } = getSummaryText();
             const activeBtn = modeButtons.find(b => b.dataset.mode === currentMode);
-            const summary = `Freight Calculation Summary:\n- Mode: ${activeBtn.textContent}\n- Miles: ${milesInput.value || 'N/A'}\n- FSC: ${fscInput.value || 0}%\n---\n- Final Total: $${finalTotal.value || '0.00'}\n- FSC Amount: $${fscTotal.value || '0.00'}\n---\n- ${yourRateLabel} ${yourRateValue}\n- ${offerLabel} ${offerValue}`.trim();
+            const summary = `Freight Calculation Summary:\n- Mode: ${activeBtn.textContent}\n- Miles: ${milesInput.value || 'N/A'}\n- Tonnage: ${tonnageInput.value || 'N/A'}\n- FSC: ${fscInput.value || 0}%\n---\n- Final Total: $${finalTotal.value || '0.00'}\n- FSC Amount: $${fscTotal.value || '0.00'}\n---\n- ${yourRateLabel} ${yourRateValue}\n- ${offerLabel} ${offerValue}`.trim();
             copySource.value = summary;
             copySource.select();
             document.execCommand('copy');
@@ -565,6 +582,7 @@
             document.getElementById('print-date').textContent = new Date().toLocaleDateString();
             document.getElementById('print-mode').textContent = activeBtn.textContent;
             document.getElementById('print-miles').textContent = milesInput.value || 'N/A';
+            document.getElementById('print-tonnage').textContent = tonnageInput.value || 'N/A';
             document.getElementById('print-fsc').textContent = `${fscInput.value || 0}%`;
             document.querySelector('#print-your-rate-row strong').textContent = yourRateLabel;
             document.getElementById('print-your-rate').textContent = yourRateValue;
